@@ -1,4 +1,4 @@
-1. Double press the reset button on the bottom of your Fightboard.
+1. Double press the reset button on the bottom of your controller.
 2. Run the update.bat file. This will launch the PowerShell script that will handle the update.
     * If successful, you should see progress bars and a success message.
     * If failure, you should see details.
