@@ -1,0 +1,12 @@
+{
+	"workbench.colorCustomizations": {
+		"activityBar.background": "#0D3506",
+		"titleBar.activeBackground": "#134B09",
+		"titleBar.activeForeground": "#F0FDEE"
+	},
+	"files.associations": {
+		"*.config": "xml",
+		"*.linq": "csharp",
+		"iom32u4.h": "c"
+	}
+}

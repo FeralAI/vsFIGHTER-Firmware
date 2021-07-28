@@ -1,0 +1,6 @@
+{
+	"sketch": "vsFIGHTER-Firmware.ino",
+	"board": "Arduino-LUFA:avr:leonardo",
+	"port": "COM8",
+	"output": ".build"
+}
