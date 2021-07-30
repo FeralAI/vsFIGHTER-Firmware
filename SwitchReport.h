@@ -1,10 +1,5 @@
-/************************************************************************************
- * Switch Gamepad
- * 
- * Class for implementing a Switch USB controller.
- ************************************************************************************/
-#ifndef _SWITCH_GAMEPAD_
-#define _SWITCH_GAMEPAD_
+#ifndef _SWITCH_REPORT_
+#define _SWITCH_REPORT_
 
 #include <stdint.h>
 
@@ -48,7 +43,7 @@ typedef struct {
 	uint8_t  RX;     // Right Stick X
 	uint8_t  RY;     // Right Stick Y
 	uint8_t  VendorSpec;
-} USB_JoystickReport_Input_t;
+} SwitchInputReport;
 
 typedef struct {
 	uint16_t Button; // 16 buttons; see JoystickButtons_t for bit mapping
@@ -57,6 +52,6 @@ typedef struct {
 	uint8_t  LY;     // Left  Stick Y
 	uint8_t  RX;     // Right Stick X
 	uint8_t  RY;     // Right Stick Y
-} USB_JoystickReport_Output_t;
+} SwitchOutputReport;
 
 #endif

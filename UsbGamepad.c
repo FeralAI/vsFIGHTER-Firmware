@@ -1,14 +1,14 @@
 #include "UsbGamepad.h"
 
-static USB_JoystickReport_Input_t switchReportData;
-static USB_JoystickReport_XInput_t xinputReportData;
+static SwitchInputReport switchReportData;
+static XInputReport xinputReportData;
 
 // Configures hardware and peripherals, such as the USB peripherals.
 void SetupHardware(InputMode inputMode) {
 
 	//set xinput_mode for descriptors.h/.c
 	currentInputMode = inputMode;
-	desc_set_xinput_mode(inputMode == XINPUT);
+	SetupDescriptor(inputMode);
 	// We need to disable watchdog if enabled by bootloader/fuses.
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
@@ -31,13 +31,17 @@ void EVENT_USB_Device_Disconnect(void) {
 
 // Fired when the host set the current configuration of the USB device after enumeration.
 void EVENT_USB_Device_ConfigurationChanged(void) {
-
-	bool isXInput = currentInputMode == XINPUT;
-	if (!isXInput) Endpoint_ConfigureEndpoint(JOYSTICK_OUT_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE, 1);
-	else Endpoint_ConfigureEndpoint((ENDPOINT_DIR_IN | 3), EP_TYPE_INTERRUPT, 32, 1);
-
-	Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, isXInput? JOYSTICK_EPSIZE_XINPUT: JOYSTICK_EPSIZE, 1);
-
+	switch (currentInputMode) {
+		case SWITCH:
+			Endpoint_ConfigureEndpoint(JOYSTICK_OUT_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_SWITCH, 1);
+			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_SWITCH, 1);
+			break;
+		case XINPUT:
+		default:
+			Endpoint_ConfigureEndpoint((ENDPOINT_DIR_IN | 3), EP_TYPE_INTERRUPT, 32, 1);
+			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_XINPUT, 1);
+			break;
+	}
 }
 
 // Process control requests sent to the device from the USB host.
@@ -84,7 +88,7 @@ void HID_Task(void) {
 			if (Endpoint_IsReadWriteAllowed())
 			{
 				// We'll create a place to store our data received from the host.
-				USB_JoystickReport_Output_t JoystickOutputData;
+				SwitchOutputReport JoystickOutputData;
 				// We'll then take in that data, setting it up in our storage.
 				Endpoint_Read_Stream_LE(&JoystickOutputData, sizeof(JoystickOutputData), NULL);
 				// At this point, we can react to this data.
@@ -108,20 +112,6 @@ void HID_Task(void) {
 		memset(Address, 0, Size);
 	}
 }
-/**
- * Retrieves the cleaned dpad state
- */
-uint8_t runSOCD(bool up, bool down, bool left, bool right) {
-	if (up && down)    { down = false; }
-	if (left && right) { left = false; right = false; }
-
-	return 0
-		^ (up ? GAMEPAD_DPAD_UP : 0)
-		^ (down ? GAMEPAD_DPAD_DOWN : 0)
-		^ (left ? GAMEPAD_DPAD_LEFT : 0)
-		^ (right ? GAMEPAD_DPAD_RIGHT : 0)
-	;
-}
 
 void sendGamepadState(GamepadState state) {
 	switch (currentInputMode) {
@@ -137,8 +127,8 @@ void sendGamepadState(GamepadState state) {
 	USB_USBTask();
 }
 
-inline USB_JoystickReport_Input_t toSwitchReport(GamepadState state) {
-	USB_JoystickReport_Input_t report;
+inline SwitchInputReport toSwitchReport(GamepadState state) {
+	SwitchInputReport report;
 
 	// Direct assignments
 	report.LX = state.lx >> 8;
@@ -180,8 +170,8 @@ inline USB_JoystickReport_Input_t toSwitchReport(GamepadState state) {
 	return report;
 }
 
-inline USB_JoystickReport_XInput_t toXInputReport(GamepadState state) {
-	USB_JoystickReport_XInput_t report;
+inline XInputReport toXInputReport(GamepadState state) {
+	XInputReport report;
 	report.rsize = 20;
 
 	// Direct assignments

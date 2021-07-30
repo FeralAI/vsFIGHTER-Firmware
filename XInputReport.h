@@ -1,13 +1,5 @@
-/************************************************************************************
- * XInput Gamepad
- * 
- * Class for implementing an XInput USB controller.
- * 
- * NOTE: The button report is broken into two separate 8-bit values, which explains
- *       the repeating values for the button masks.
- ************************************************************************************/
-#ifndef _XINPUT_GAMEPAD_
-#define _XINPUT_GAMEPAD_
+#ifndef _XINPUT_REPORT_
+#define _XINPUT_REPORT_
 
 #include <stdint.h>
 
@@ -43,6 +35,6 @@ typedef struct {
   int r_x;
   int r_y;
   uint8_t reserved_1[6];
-} USB_JoystickReport_XInput_t;
+} XInputReport;
 
 #endif

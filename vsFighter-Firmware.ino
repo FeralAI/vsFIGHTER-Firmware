@@ -1,7 +1,7 @@
 #include <LUFA.h>
 #include <EEPROM.h>
 #include "UsbGamepad.h"
-#include "Controllers/VsFighter/VsFighter_Board.h"
+#include "VsFighter_Board.h"
 
 #define EEPROM_INPUT_MODE_INDEX 0
 #define EEPROM_DPAD_MODE_INDEX  1
@@ -40,40 +40,34 @@ void setup() {
 }
 
 void loop() {
+	// Cache previous gamepad state
+	GamepadState previousState = board.state;
+	DpadMode previousDpadMode = dpadMode;
+
 	// Read inputs
 	board.update(dpadMode);
 
 	// Check hotkeys
-	if (board.isHotkeyPressed()) {
-		bool update = true;
-		bool pressed = false;
-		if (board.isDpadLeftPressed()) {
-			dpadMode = LEFT_ANALOG;
-			pressed = true;
-		} else if (board.isDpadRightPressed()) {
-			dpadMode = RIGHT_ANALOG;
-			pressed = true;
-		} else if (board.isDpadUpPressed()) {
-			dpadMode = DIGITAL;
-			pressed = true;
-		} else if (board.isDpadDownPressed()) {
-			board.pressHomeButton();
-			update = false;
-			pressed = true;
-		}
-		else update = false;
-
-		// D-pad mode changed, persist to EEPROM and reprocess inputs
-		if (update) {
-			EEPROM.put(EEPROM_DPAD_MODE_INDEX, dpadMode);
-			board.update(dpadMode);
-		}
-
-		// Clear hotkey presses after any state updates
-		if (pressed)
-			board.clearHotkeyState();
+	HotkeyAction action = board.checkHotkeys();
+	switch (action) {
+		case HotkeyAction::DPAD_DIGITAL:
+			dpadMode = DpadMode::DIGITAL;
+			break;
+		case HotkeyAction::DPAD_LEFT_ANALOG:
+			dpadMode = DpadMode::LEFT_ANALOG;
+			break;
+		case HotkeyAction::DPAD_RIGHT_ANALOG:
+			dpadMode = DpadMode::RIGHT_ANALOG;
+			break;
 	}
 
-	// Send button state
-	sendGamepadState(board.state);
+	// D-pad mode changed, persist to EEPROM and reprocess inputs
+	if (previousDpadMode != dpadMode)
+		EEPROM.put(EEPROM_DPAD_MODE_INDEX, dpadMode);
+
+	// Process USB task for this loop cycle
+	if (board.compareState(previousState))
+		USB_USBTask();
+	else
+		sendGamepadState(board.state);
 }

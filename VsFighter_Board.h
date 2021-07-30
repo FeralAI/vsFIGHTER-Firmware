@@ -1,10 +1,7 @@
 #ifndef _VSFIGHTER_BOARD_
 #define _VSFIGHTER_BOARD_
 
-#include "../../ControlBoard.h"
-
-#define USE_CAPTURE_HOTKEY 0
-#define USE_HOME_HOTKEY 1
+#include "ControlBoard.h"
 
 // Pin mappings
 #define PORT_PIN_UP     PF7 // A0
@@ -49,6 +46,8 @@ class VsFighterBoard: public ControlBoard {
 		}
 
 		void update(DpadMode dpadMode) {
+			/* Run time currently 16-24μs, typically 20μs */
+
 			uint8_t portStates[3];
 			portStates[PORTB_INDEX] = ~PINB;
 			portStates[PORTD_INDEX] = ~PIND;

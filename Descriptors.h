@@ -5,8 +5,7 @@
 #include "LUFAConfig.h"
 #include <avr/pgmspace.h>
 #include <LUFA/LUFA/Drivers/USB/USB.h>
-
-void desc_set_xinput_mode(bool value);
+#include "GamepadState.h"
 
 // Type Defines
 // Device Configuration Descriptor Structure
@@ -37,20 +36,21 @@ enum StringDescriptors_t {
 // Endpoint Addresses
 #define JOYSTICK_IN_EPADDR  (ENDPOINT_DIR_IN  | 1)
 #define JOYSTICK_OUT_EPADDR (ENDPOINT_DIR_OUT | 2)
+
 // HID Endpoint Size
 // The Switch -needs- this to be 64.
 // The Wii U is flexible, allowing us to use the default of 8 (which did not match the original Hori descriptors).
-#define JOYSTICK_EPSIZE           64
+#define JOYSTICK_EPSIZE_SWITCH           64
 #define JOYSTICK_EPSIZE_XINPUT           20
 // Descriptor Header Type - HID Class HID Descriptor
 #define DTYPE_HID                 0x21
 // Descriptor Header Type - HID Class HID Report Descriptor
 #define DTYPE_Report              0x22
-    
+
 /* Function Prototypes: */
-uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
-                                    const uint16_t wIndex,
-                                    const void** const DescriptorAddress)
-                                    ATTR_WARN_UNUSED_RESULT ATTR_NON_NULL_PTR_ARG(3);
+void SetupDescriptor(InputMode mode);
+
+uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex, const void** const DescriptorAddress)
+	ATTR_WARN_UNUSED_RESULT ATTR_NON_NULL_PTR_ARG(3);
 
 #endif
