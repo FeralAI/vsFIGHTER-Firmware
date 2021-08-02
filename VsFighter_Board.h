@@ -1,7 +1,7 @@
 #ifndef _VSFIGHTER_BOARD_
 #define _VSFIGHTER_BOARD_
 
-#include "ControlBoard.h"
+#include "Gamepad.h"
 
 // Pin mappings
 #define PORT_PIN_UP     PF7 // A0
@@ -31,9 +31,11 @@
 #define PORTD_INDEX 1
 #define PORTF_INDEX 2
 
-class VsFighterBoard: public ControlBoard {
+class VsFighterBoard: public Gamepad {
 	public:
-		void setupPins() {
+		VsFighterBoard(uint32_t debounceMicros = 0) : Gamepad(debounceMicros) { }
+
+		void setup() {
 			// Set to input (invert mask to set to 0)
 			DDRB = DDRB & ~PORTB_INPUT_MASK;
 			DDRD = DDRD & ~PORTD_INPUT_MASK;
@@ -45,9 +47,8 @@ class VsFighterBoard: public ControlBoard {
 			PORTF = PORTF | PORTF_INPUT_MASK;
 		}
 
-		void update(DpadMode dpadMode) {
+		void read() {
 			/* Run time currently 16-24μs, typically 20μs */
-
 			uint8_t portStates[3];
 			portStates[PORTB_INDEX] = ~PINB;
 			portStates[PORTD_INDEX] = ~PIND;
@@ -55,12 +56,34 @@ class VsFighterBoard: public ControlBoard {
 
 			state.hasAnalogTriggers = false;
 
-			// Set D-Pad
+			// Gather raw inputs
 			state.dpadInputs = 0
 				| ((portStates[PORTF_INDEX] >> PORT_PIN_UP    & 1) ? 1 << 0 : 0)
 				| ((portStates[PORTF_INDEX] >> PORT_PIN_DOWN  & 1) ? 1 << 1 : 0)
 				| ((portStates[PORTF_INDEX] >> PORT_PIN_LEFT  & 1) ? 1 << 2 : 0)
 				| ((portStates[PORTF_INDEX] >> PORT_PIN_RIGHT & 1) ? 1 << 3 : 0);
+
+			state.buttonInputs = 0
+				| ((portStates[PORTD_INDEX] >> PORT_PIN_K1 & 1)     ? 1 << 0  : 0) // Generic: K1, Switch: B, Xbox: A
+				| ((portStates[PORTD_INDEX] >> PORT_PIN_K2 & 1)     ? 1 << 1  : 0) // Generic: K2, Switch: A, Xbox: B
+				| ((portStates[PORTD_INDEX] >> PORT_PIN_P1 & 1)     ? 1 << 2  : 0) // Generic: P1, Switch: Y, Xbox: X
+				| ((portStates[PORTD_INDEX] >> PORT_PIN_P2 & 1)     ? 1 << 3  : 0) // Generic: P2, Switch: X, Xbox: Y
+				| ((portStates[PORTD_INDEX] >> PORT_PIN_P4 & 1)     ? 1 << 4  : 0) // Generic: P4, Switch: L, Xbox: LB
+				| ((portStates[PORTB_INDEX] >> PORT_PIN_P3 & 1)     ? 1 << 5  : 0) // Generic: P3, Switch: R, Xbox: RB
+				| ((portStates[PORTD_INDEX] >> PORT_PIN_K4 & 1)     ? 1 << 6  : 0) // Generic: K4, Switch: ZL, Xbox: LT (Digital)
+				| ((portStates[PORTB_INDEX] >> PORT_PIN_K3 & 1)     ? 1 << 7  : 0) // Generic: K3, Switch: ZR, Xbox: RT (Digital)
+				| ((portStates[PORTB_INDEX] >> PORT_PIN_SELECT & 1) ? 1 << 8  : 0) // Generic: Select, Switch: -, Xbox: View
+				| ((portStates[PORTB_INDEX] >> PORT_PIN_START & 1)  ? 1 << 9  : 0) // Generic: Start, Switch: +, Xbox: Menu
+				| ((portStates[PORTB_INDEX] >> PORT_PIN_LS & 1)     ? 1 << 10 : 0) // All: Left Stick Click
+				| ((portStates[PORTB_INDEX] >> PORT_PIN_RS & 1)     ? 1 << 11 : 0) // All: Right Stick Click
+			;
+
+			// Run debouncing if necessary
+			if (debounceMicros > 0)
+				debounce();
+
+			// Set button states
+			state.buttons = state.buttonInputs;
 
 			state.dpad = runSOCD(
 				state.dpadInputs & GAMEPAD_DPAD_UP,
@@ -92,23 +115,7 @@ class VsFighterBoard: public ControlBoard {
 					break;
 			}
 
-			// Set buttons
-			state.buttons = 0
-				| ((portStates[PORTD_INDEX] >> PORT_PIN_K1 & 1)     ? 1 << 0  : 0) // Generic: K1, Switch: B, Xbox: A
-				| ((portStates[PORTD_INDEX] >> PORT_PIN_K2 & 1)     ? 1 << 1  : 0) // Generic: K2, Switch: A, Xbox: B
-				| ((portStates[PORTD_INDEX] >> PORT_PIN_P1 & 1)     ? 1 << 2  : 0) // Generic: P1, Switch: Y, Xbox: X
-				| ((portStates[PORTD_INDEX] >> PORT_PIN_P2 & 1)     ? 1 << 3  : 0) // Generic: P2, Switch: X, Xbox: Y
-				| ((portStates[PORTD_INDEX] >> PORT_PIN_P4 & 1)     ? 1 << 4  : 0) // Generic: P4, Switch: L, Xbox: LB
-				| ((portStates[PORTB_INDEX] >> PORT_PIN_P3 & 1)     ? 1 << 5  : 0) // Generic: P3, Switch: R, Xbox: RB
-				| ((portStates[PORTD_INDEX] >> PORT_PIN_K4 & 1)     ? 1 << 6  : 0) // Generic: K4, Switch: ZL, Xbox: LT (Digital)
-				| ((portStates[PORTB_INDEX] >> PORT_PIN_K3 & 1)     ? 1 << 7  : 0) // Generic: K3, Switch: ZR, Xbox: RT (Digital)
-				| ((portStates[PORTB_INDEX] >> PORT_PIN_SELECT & 1) ? 1 << 8  : 0) // Generic: Select, Switch: -, Xbox: View
-				| ((portStates[PORTB_INDEX] >> PORT_PIN_START & 1)  ? 1 << 9  : 0) // Generic: Start, Switch: +, Xbox: Menu
-				| ((portStates[PORTB_INDEX] >> PORT_PIN_LS & 1)     ? 1 << 10 : 0) // All: Left Stick Click
-				| ((portStates[PORTB_INDEX] >> PORT_PIN_RS & 1)     ? 1 << 11 : 0) // All: Right Stick Click
-			;
-
-			// No analog support, center values
+			// No analog triggers
 			state.lt = 0;
 			state.rt = 0;
 		}

@@ -310,7 +310,7 @@ const uint8_t PROGMEM ConfigurationDescriptorXInput[] =
   0x00, 0x01, 0x01, 0x03
 };
 
-const uint8_t PROGMEM DeviceDescriptorDualShock3[] = {
+const uint8_t PROGMEM DeviceDescriptorDS3[] = {
 	0x12,        // bLength
 	0x01,        // bDescriptorType (Device)
 	0x00, 0x02,  // bcdUSB 2.00
@@ -327,7 +327,7 @@ const uint8_t PROGMEM DeviceDescriptorDualShock3[] = {
 	0x01,        // bNumConfigurations 1
 };
 
-const uint8_t PROGMEM ConfigurationDescriptorDualShock3[] = {
+const uint8_t PROGMEM ConfigurationDescriptorDS3[] = {
 	0x09,        // bLength
 	0x02,        // bDescriptorType (Configuration)
 	0x29, 0x00,  // wTotalLength 41
@@ -370,7 +370,7 @@ const uint8_t PROGMEM ConfigurationDescriptorDualShock3[] = {
 	0x01,        // bInterval 1 (unit depends on device speed)
 };
 
-const uint8_t PROGMEM JoystickReportDualShock3[] = {
+const uint8_t PROGMEM JoystickReportDS3[] = {
 	0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 	0x09, 0x04,        // Usage (Joystick)
 	0xA1, 0x01,        // Collection (Physical)
@@ -454,14 +454,14 @@ const uint8_t PROGMEM JoystickReportDualShock3[] = {
 const USB_Descriptor_String_t PROGMEM LanguageString = USB_STRING_DESCRIPTOR_ARRAY(LANGUAGE_ID_ENG);
 const USB_Descriptor_String_t PROGMEM VersionString = USB_STRING_DESCRIPTOR(L"1.0");
 
+const USB_Descriptor_String_t PROGMEM ManufacturerStringDS3 = USB_STRING_DESCRIPTOR(L"Sony");
+const USB_Descriptor_String_t PROGMEM ProductStringDS3 = USB_STRING_DESCRIPTOR(L"PLAYSTATION(R)3 Controller");
+
 const USB_Descriptor_String_t PROGMEM ManufacturerStringSwitch = USB_STRING_DESCRIPTOR(L"HORI CO.,LTD.");
 const USB_Descriptor_String_t PROGMEM ProductStringSwitch = USB_STRING_DESCRIPTOR(L"POKKEN CONTROLLER");
 
 const USB_Descriptor_String_t PROGMEM ManufacturerStringXInput = USB_STRING_DESCRIPTOR(L"Microsoft");
 const USB_Descriptor_String_t PROGMEM ProductStringXInput = USB_STRING_DESCRIPTOR(L"XInput STANDARD GAMEPAD");
-
-const USB_Descriptor_String_t PROGMEM ManufacturerStringDS4 = USB_STRING_DESCRIPTOR(L"Sony Interactive Entertainment");
-const USB_Descriptor_String_t PROGMEM ProductStringDS4 = USB_STRING_DESCRIPTOR(L"Wireless Controller");
 
 void SetupDescriptor(InputMode mode) {
   inputMode = mode;
@@ -476,6 +476,47 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex
 	uint16_t    Size    = NO_DESCRIPTOR;
 
 	switch (inputMode) {
+		case DUALSHOCK3:
+			switch (DescriptorType) {
+				case DTYPE_Device:
+					Address = &DeviceDescriptorDS3;
+					Size    = sizeof(USB_Descriptor_Device_t);
+					break;
+				case DTYPE_Configuration:
+					Address = &ConfigurationDescriptorDS3;
+					Size    = sizeof(USB_Descriptor_Configuration_t);
+					break;
+				case DTYPE_String:
+					switch (DescriptorNumber) {
+						case STRING_ID_Language:
+							Address = &LanguageString;
+							Size    = pgm_read_byte(&LanguageString.Header.Size);
+							break;
+						case STRING_ID_Manufacturer:
+							Address = &ManufacturerStringDS3;
+							Size    = pgm_read_byte(&ManufacturerStringDS3.Header.Size);
+							break;
+						case STRING_ID_Product:
+							Address = &ProductStringDS3;
+							Size    = pgm_read_byte(&ProductStringDS3.Header.Size);
+							break;
+						case STRING_ID_Version:
+							Address = &VersionString;
+							Size    = pgm_read_byte(&VersionString.Header.Size);
+							break;
+					}
+					break;
+				case DTYPE_HID:
+					Address = &ConfigurationDescriptorDS3;
+					Size    = sizeof(USB_HID_Descriptor_HID_t);
+					break;
+				case DTYPE_Report:
+					Address = &JoystickReportDS3;
+					Size    = sizeof(JoystickReportDS3);
+					break;
+			}
+			break;
+
 		case SWITCH:
 			switch (DescriptorType) {
 				case DTYPE_Device:

@@ -37,4 +37,15 @@ typedef struct {
   uint8_t reserved_1[6];
 } XInputReport;
 
+__attribute__((always_inline)) static inline bool checkXInputReportChanged(XInputReport *lastReport, XInputReport *nextReport) {
+	return &lastReport->digital_buttons_1 != &nextReport->digital_buttons_1
+	    || &lastReport->digital_buttons_2 != &nextReport->digital_buttons_2
+	    || &lastReport->l_x != &nextReport->l_x
+	    || &lastReport->l_y != &nextReport->l_y
+	    || &lastReport->r_x != &nextReport->r_x
+	    || &lastReport->r_y != &nextReport->r_y
+	    || &lastReport->lt != &nextReport->lt
+	    || &lastReport->rt != &nextReport->rt;
+}
+
 #endif

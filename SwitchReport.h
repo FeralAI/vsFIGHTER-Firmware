@@ -54,4 +54,13 @@ typedef struct {
 	uint8_t  RY;     // Right Stick Y
 } SwitchOutputReport;
 
+__attribute__((always_inline)) static inline bool checkSwitchReportChanged(SwitchInputReport *lastReport, SwitchInputReport *nextReport) {
+	return &lastReport->Button != &nextReport->Button
+	    || &lastReport->HAT != &nextReport->HAT
+	    || &lastReport->LX != &nextReport->LX
+	    || &lastReport->LY != &nextReport->LY
+	    || &lastReport->RX != &nextReport->RX
+	    || &lastReport->RY != &nextReport->RY;
+}
+
 #endif
