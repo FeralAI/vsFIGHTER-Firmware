@@ -73,7 +73,3 @@ You can switch between the 3 modes for the D-Pad **while the controller is in us
 * **`SELECT + START + RIGHT`** - Emulate Right Analog stick
 
 D-Pad mode is saved across power cycles.
-
-## Acknowledgments
-
-The base of this project was adapted from [CrazyRedMachine's LUFAHybridFightstick](https://github.com/CrazyRedMachine/LUFAHybridFightstick), which was based on [fluffymadness' ATMega32U4-Switch-Fightstick](https://github.com/fluffymadness/ATMega32U4-Switch-Fightstick) and [bootsector's XInputPadMicro](https://github.com/bootsector/XInputPadMicro). There's not a whole lot of the original sketch left, but a lot of the glue is still here and it was a great starting off point.
