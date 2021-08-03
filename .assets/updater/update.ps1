@@ -1,4 +1,4 @@
-$file = 'vsFIGHTER-Firmware.ino.hex'
+$file = 'vsFIGHTER-Firmware.hex'
 $entry = Get-CimInstance -Class Win32_SerialPort -Filter "Name LIKE '%Arduino Leonardo bootloader%'" | Select-Object DeviceID
 if ($null -eq $entry) {
 	Write-Output 'vsFIGHTER-Firmware not found. Press the reset button on the bottom twice then try again.'

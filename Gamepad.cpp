@@ -15,11 +15,11 @@ HotkeyAction Gamepad::checkHotkeys() {
 			action = HotkeyAction::DPAD_RIGHT_ANALOG;
 			state.dpad = 0;
 			state.buttons &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
-		} else if (isDpadUpPressed()) {
+		} else if (isDpadDownPressed()) {
 			action = HotkeyAction::DPAD_DIGITAL;
 			state.dpad = 0;
 			state.buttons &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
-		} else if (isDpadDownPressed()) {
+		} else if (isDpadUpPressed()) {
 			action = HotkeyAction::HOME_BUTTON;
 			state.dpad = 0;
 			state.buttons |= GAMEPAD_BUTTON_13;

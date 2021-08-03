@@ -53,7 +53,7 @@ Any references to these buttons will use the `Generic` labels in this documentat
 
 ### Home Button
 
-There is no dedicted Home/Logo button on the vsFIGTHTER, but you can activate it via the button combination **`SELECT + START + DOWN`**.
+There is no dedicted Home/Logo button on the vsFIGTHTER, but you can activate it via the button combination **`SELECT + START + UP`**.
 
 ### Input Modes
 
@@ -68,7 +68,7 @@ Input mode is saved across power cycles.
 
 You can switch between the 3 modes for the D-Pad **while the controller is in use by pressing one of the following combinations:**
 
-* **`SELECT + START + UP`** - D-Pad
+* **`SELECT + START + DOWN`** - D-Pad
 * **`SELECT + START + LEFT`** - Emulate Left Analog stick
 * **`SELECT + START + RIGHT`** - Emulate Right Analog stick
 
