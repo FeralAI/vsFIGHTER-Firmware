@@ -4,24 +4,24 @@
 #include <stdint.h>
 
 // Button report 1 (8 bits)
-#define XBOX_MASK_DPAD_UP      0x01
-#define XBOX_MASK_DPAD_DOWN    0x02
-#define XBOX_MASK_DPAD_LEFT    0x04
-#define XBOX_MASK_DPAD_RIGHT   0x08
-#define XBOX_MASK_START        0x10
-#define XBOX_MASK_BACK         0x20
-#define XBOX_MASK_LEFT_STICK   0x40
-#define XBOX_MASK_RIGHT_STICK  0x80
+#define XBOX_MASK_DPAD_UP     (1U << 0)
+#define XBOX_MASK_DPAD_DOWN   (1U << 1)
+#define XBOX_MASK_DPAD_LEFT   (1U << 2)
+#define XBOX_MASK_DPAD_RIGHT  (1U << 3)
+#define XBOX_MASK_START       (1U << 4)
+#define XBOX_MASK_BACK        (1U << 5)
+#define XBOX_MASK_LEFT_STICK  (1U << 6)
+#define XBOX_MASK_RIGHT_STICK (1U << 7)
 
 // Button report 2 (8 bits)
-#define XBOX_MASK_LB           0x01
-#define XBOX_MASK_RB           0x02
-#define XBOX_MASK_HOME         0x04
-//#define UNUSED               0x08
-#define XBOX_MASK_A            0x10
-#define XBOX_MASK_B            0x20
-#define XBOX_MASK_X            0x40
-#define XBOX_MASK_Y            0x80
+#define XBOX_MASK_LB          (1U << 0)
+#define XBOX_MASK_RB          (1U << 1)
+#define XBOX_MASK_HOME        (1U << 2)
+//#define UNUSED              (1U << 3)
+#define XBOX_MASK_A           (1U << 4)
+#define XBOX_MASK_B           (1U << 5)
+#define XBOX_MASK_X           (1U << 6)
+#define XBOX_MASK_Y           (1U << 7)
 
 typedef struct {
   uint8_t rid;

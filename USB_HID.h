@@ -5,6 +5,7 @@
 #include <avr/wdt.h>
 
 #include "Descriptors.h"
+#include "DS3Report.h"
 #include "SwitchReport.h"
 #include "XInputReport.h"
 
@@ -21,6 +22,7 @@ void SetupHardware(InputMode inputMode);
 void HID_Task(void);
 
 // Supported report functions
+void sendDS3Report(DS3Report *reportData);
 void sendSwitchReport(SwitchInputReport *reportData);
 void sendXInputReport(XInputReport *reportData);
 

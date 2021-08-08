@@ -1,5 +1,6 @@
 #include "USB_HID.h"
 
+static DS3Report ds3ReportData;
 static SwitchInputReport switchReportData;
 static XInputReport xinputReportData;
 
@@ -32,6 +33,10 @@ void EVENT_USB_Device_Disconnect(void) {
 // Fired when the host set the current configuration of the USB device after enumeration.
 void EVENT_USB_Device_ConfigurationChanged(void) {
 	switch (currentInputMode) {
+		case DUALSHOCK3:
+			Endpoint_ConfigureEndpoint(JOYSTICK_OUT_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_DS3, 1);
+			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_DS3, 1);
+			break;
 		case SWITCH:
 			Endpoint_ConfigureEndpoint(JOYSTICK_OUT_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_SWITCH, 1);
 			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_SWITCH, 1);
@@ -56,7 +61,14 @@ void EVENT_USB_Device_ControlRequest(void) {
 				Endpoint_ClearSETUP();
 
 				/* Write the report data to the control endpoint */
-				Endpoint_Write_Control_Stream_LE(&xinputReportData, 20);
+				switch (currentInputMode) {
+					case XINPUT:
+						Endpoint_Write_Control_Stream_LE(&xinputReportData, 20);
+						break;
+					case DUALSHOCK3:
+						Endpoint_Write_Control_Stream_LE(&ds3ReportData, JOYSTICK_EPSIZE_DS3);
+						break;
+				}
 				Endpoint_ClearOUT();
 			}
 			break;
@@ -111,6 +123,12 @@ void HID_Task(void) {
 		/* Clear the report data afterwards */
 		memset(Address, 0, Size);
 	}
+}
+
+void sendDS3Report(DS3Report *reportData) {
+	ds3ReportData = *reportData;
+	HID_Task();
+	USB_USBTask();
 }
 
 void sendSwitchReport(SwitchInputReport *reportData) {

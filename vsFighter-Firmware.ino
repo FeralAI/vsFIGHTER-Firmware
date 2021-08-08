@@ -1,13 +1,11 @@
 #include <EEPROM.h>
 #include <LUFA.h>
-#include "USB_HID.h"
 
-// Set DEBOUNCE_MICROS to 0 to disable debouncing
-#define DEBOUNCE_MICROS 5000
+// Override default debounce time set for the board, 0 to disable
+#define DEBOUNCE_MILLIS 5
 
-#include "VsFighter_Board.h"
-VsFighterBoard board(DEBOUNCE_MICROS);
-
+#include "VsFighter.h"
+VsFighter board;
 
 void setup() {
 	// Get saved options
@@ -17,12 +15,11 @@ void setup() {
 
 	// Configure board
 	board.setup();
-	delay(500);
 
 	// Perform initial button read
-	board.update();
+	board.read();
 
-	// Set input mode - only write to EEPROM if necessary
+	// Set input mode and persist if necessary
 	InputMode lastInputMode = board.inputMode;
 	if (board.isRightStickButtonPressed()) board.inputMode = InputMode::DUALSHOCK3;
 	else if (board.isSelectPressed())      board.inputMode = InputMode::SWITCH;
@@ -40,6 +37,11 @@ void loop() {
 	// Read inputs
 	board.read();
 
+#if DEBOUNCE_MILLIS > 0
+	// Run debouncing if required
+	board.debounce();
+#endif
+
 	// Check hotkeys
 	HotkeyAction action = board.checkHotkeys();
 	if (action != HotkeyAction::NONE) {
@@ -52,12 +54,15 @@ void loop() {
 				case HotkeyAction::DPAD_RIGHT_ANALOG: board.dpadMode = DpadMode::RIGHT_ANALOG; break;
 			}
 
-			// D-pad mode changed, persist to EEPROM
+			// Persist dpad mode change
 			if (lastDpadMode != board.dpadMode)
 				EEPROM.put(EEPROM_DPAD_MODE_INDEX, board.dpadMode);
 		}
 	}
 
-	// Process USB task for this loop cycle
+	// Process the raw inputs into a usable state
+	board.process();
+
+	// Run the USB task for this loop cycle
 	board.update();
 }

@@ -5,7 +5,6 @@
 #include "LUFAConfig.h"
 #include <avr/pgmspace.h>
 #include <LUFA/LUFA/Drivers/USB/USB.h>
-#include "GamepadState.h"
 
 typedef enum {
 	XINPUT,

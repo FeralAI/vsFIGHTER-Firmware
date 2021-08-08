@@ -9,8 +9,14 @@
 
 #include "USB_HID.h"
 #include "GamepadState.h"
+#include "GamepadDebouncer.h"
+#include "DS3Report.h"
 #include "SwitchReport.h"
 #include "XInputReport.h"
+
+#ifndef DEBOUNCE_MILLIS
+#define DEBOUNCE_MILLIS 0
+#endif
 
 #define EEPROM_INPUT_MODE_INDEX 0
 #define EEPROM_DPAD_MODE_INDEX  1
@@ -18,65 +24,92 @@
 
 class Gamepad {
 	public:
-		Gamepad(uint32_t debounceMicros = 0);
+		Gamepad() {
+				#if DEBOUNCE_MILLIS > 0
+					for (int i = 0; i < GAMEPAD_DEBOUNCE_BUTTON_COUNT; i++) {
+						debouncers[i].setGamepadState(currentState);
+					}
+				#endif
+		}
 
 		GamepadState previousState;
-		GamepadState state;
+		GamepadState currentState;
 		DpadMode dpadMode;
 		InputMode inputMode;
 		uint8_t ledMode = 0;
 
 		/**
-		 * Performs pin setup and other initialization
+		 * Perform pin setup and any other initialization the board requires
 		 */
 		virtual void setup();
 
 		/**
-		 * Retrieves the current inputs and updates the gamepad state
+		 * Retrieve the raw inputs and save to the current GamepadState
 		 */
 		virtual void read();
 
 		/**
-		 * Run debouncing algorithm against the cached GamepadState
+		 * Returns if the function button/hotkey is pressed, override in derived board class
+		 */
+		virtual bool isFunctionPressed();
+
+		/**
+		 * Run debouncing algorithm against raw inputs in the current GamepadState
 		 */
 		void debounce();
 
-		HotkeyAction checkHotkeys();
-		inline bool checkStateChanged(GamepadState otherState) __attribute__((always_inline));
-		uint16_t dpadToAnalogX();
-		uint16_t dpadToAnalogY();
-
-		SwitchInputReport getSwitchReport();
-		XInputReport getXInputReport();
-
-		bool isDpadUpPressed();
-		bool isDpadDownPressed();
-		bool isDpadLeftPressed();
-		bool isDpadRightPressed();
-		bool isFunctionPressed();
-		bool isLeftStickButtonPressed();
-		bool isRightStickButtonPressed();
-		bool isSelectPressed();
-		bool isStartPressed();
-
 		/**
-		 * Retrieves the cleaned dpad state
+		 * Process the raw inputs to fill the current GamepadState
 		 */
-		uint8_t runSOCD(bool up, bool down, bool left, bool right);
+		void process();
 
 		/**
 		 * Send the latest GamepadState to the USB Host.
 		 */
 		void update();
 
-	protected:
-		/**
-		 * The debounce window (in microseconds) in which a button state change will not be allowed
-		 */
-		uint32_t debounceMicros = 0;
+		HotkeyAction checkHotkeys();
 
-		uint32_t dpadDebouceTimers[4];
-		uint32_t buttonDebounceTimers[GAMEPAD_ACTIVE_BUTTON_COUNT];
+		DS3Report getDS3Report();
+		SwitchInputReport getSwitchReport();
+		XInputReport getXInputReport();
+
+		__attribute__((always_inline)) inline bool isDpadUpPressed()           { return (currentState.dpadInputs   & GAMEPAD_DPAD_UP)    > 0; }
+		__attribute__((always_inline)) inline bool isDpadDownPressed()         { return (currentState.dpadInputs   & GAMEPAD_DPAD_DOWN)  > 0; }
+		__attribute__((always_inline)) inline bool isDpadLeftPressed()         { return (currentState.dpadInputs   & GAMEPAD_DPAD_LEFT)  > 0; }
+		__attribute__((always_inline)) inline bool isDpadRightPressed()        { return (currentState.dpadInputs   & GAMEPAD_DPAD_RIGHT) > 0; }
+		__attribute__((always_inline)) inline bool isLeftStickButtonPressed()  { return (currentState.buttonInputs & GAMEPAD_BUTTON_11)  > 0; }
+		__attribute__((always_inline)) inline bool isRightStickButtonPressed() { return (currentState.buttonInputs & GAMEPAD_BUTTON_12)  > 0; }
+		__attribute__((always_inline)) inline bool isSelectPressed()           { return (currentState.buttonInputs & GAMEPAD_BUTTON_09)  > 0; }
+		__attribute__((always_inline)) inline bool isStartPressed()            { return (currentState.buttonInputs & GAMEPAD_BUTTON_10)  > 0; }
+
+	protected:
+#if DEBOUNCE_MILLIS > 0
+		GamepadDebouncer debouncers[GAMEPAD_ACTIVE_BUTTON_COUNT + 4] = {
+			GamepadDebouncer(GAMEPAD_DPAD_UP,    DEBOUNCE_MILLIS, true),
+			GamepadDebouncer(GAMEPAD_DPAD_DOWN,  DEBOUNCE_MILLIS, true),
+			GamepadDebouncer(GAMEPAD_DPAD_LEFT,  DEBOUNCE_MILLIS, true),
+			GamepadDebouncer(GAMEPAD_DPAD_RIGHT, DEBOUNCE_MILLIS, true),
+			GamepadDebouncer(GAMEPAD_BUTTON_01,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_02,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_03,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_04,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_05,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_06,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_07,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_08,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_09,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_10,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_11,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_12,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_13,  DEBOUNCE_MILLIS, false),
+			GamepadDebouncer(GAMEPAD_BUTTON_14,  DEBOUNCE_MILLIS, false),
+			// GamepadDebouncer(GAMEPAD_BUTTON_15, DEBOUNCE_MILLIS, false), // unused
+			// GamepadDebouncer(GAMEPAD_BUTTON_16, DEBOUNCE_MILLIS, false), // unused
+		}; // Buttons + dpad
+#else
+		GamepadDebouncer debouncers[0];
+#endif
 };
 
 #endif

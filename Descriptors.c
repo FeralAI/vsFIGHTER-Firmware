@@ -370,6 +370,16 @@ const uint8_t PROGMEM ConfigurationDescriptorDS3[] = {
 	0x01,        // bInterval 1 (unit depends on device speed)
 };
 
+const uint8_t PROGMEM HIDDescriptorDS3[] = {
+	0x09,        // bLength
+	0x21,        // bDescriptorType (HID)
+	0x11, 0x01,  // bcdHID 1.17
+	0x00,        // bCountryCode
+	0x01,        // bNumDescriptors
+	0x22,        // bDescriptorType[0] (HID)
+	0x94, 0x00,  // wDescriptorLength[0] 148
+};
+
 const uint8_t PROGMEM JoystickReportDS3[] = {
 	0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 	0x09, 0x04,        // Usage (Joystick)
@@ -507,8 +517,10 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex
 					}
 					break;
 				case DTYPE_HID:
-					Address = &ConfigurationDescriptorDS3;
-					Size    = sizeof(USB_HID_Descriptor_HID_t);
+					// Address = &ConfigurationDescriptorDS3;
+					// Size    = sizeof(USB_HID_Descriptor_HID_t);
+					Address = &HIDDescriptorDS3;
+					Size    = sizeof(HIDDescriptorDS3);
 					break;
 				case DTYPE_Report:
 					Address = &JoystickReportDS3;

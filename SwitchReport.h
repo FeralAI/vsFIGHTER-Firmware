@@ -15,25 +15,25 @@
 #define SWITCH_DPAD_VALUE_NOTHING   0x08
 
 // Button report (16 bits)
-#define SWITCH_MASK_Y               0x01
-#define SWITCH_MASK_B               0x02
-#define SWITCH_MASK_A               0x04
-#define SWITCH_MASK_X               0x08
-#define SWITCH_MASK_L               0x10
-#define SWITCH_MASK_R               0x20
-#define SWITCH_MASK_ZL              0x40
-#define SWITCH_MASK_ZR              0x80
-#define SWITCH_MASK_MINUS           0x100
-#define SWITCH_MASK_PLUS            0x200
-#define SWITCH_MASK_L3              0x400
-#define SWITCH_MASK_R3              0x800
-#define SWITCH_MASK_HOME            0x1000
-#define SWITCH_MASK_CAPTURE         0x2000
+#define SWITCH_MASK_Y       (1U <<  0)
+#define SWITCH_MASK_B       (1U <<  1)
+#define SWITCH_MASK_A       (1U <<  2)
+#define SWITCH_MASK_X       (1U <<  3)
+#define SWITCH_MASK_L       (1U <<  4)
+#define SWITCH_MASK_R       (1U <<  5)
+#define SWITCH_MASK_ZL      (1U <<  6)
+#define SWITCH_MASK_ZR      (1U <<  7)
+#define SWITCH_MASK_MINUS   (1U <<  8)
+#define SWITCH_MASK_PLUS    (1U <<  9)
+#define SWITCH_MASK_L3      (1U << 10)
+#define SWITCH_MASK_R3      (1U << 11)
+#define SWITCH_MASK_HOME    (1U << 12)
+#define SWITCH_MASK_CAPTURE (1U << 13)
 
 // Switch analog sticks only report 8 bits
-#define SWITCH_ANALOG_MIN 0
-#define SWITCH_ANALOG_MID 128
-#define SWITCH_ANALOG_MAX 255
+#define SWITCH_ANALOG_MIN 0x00
+#define SWITCH_ANALOG_MID 0x80
+#define SWITCH_ANALOG_MAX 0xFF
 
 typedef struct {
 	uint16_t Button; // 16 buttons; see JoystickButtons_t for bit mapping
