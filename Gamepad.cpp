@@ -3,20 +3,20 @@
 HotkeyAction Gamepad::checkHotkeys() {
 	HotkeyAction action = HotkeyAction::NONE;
 	if (isFunctionPressed()) {
-		currentState.buttons &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
+		currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
 		if (isDpadLeftPressed()) {
 			action = HotkeyAction::DPAD_LEFT_ANALOG;
-			currentState.dpad = 0;
+			currentState.dpadInputs = 0;
 		} else if (isDpadRightPressed()) {
 			action = HotkeyAction::DPAD_RIGHT_ANALOG;
-			currentState.dpad = 0;
+			currentState.dpadInputs = 0;
 		} else if (isDpadDownPressed()) {
 			action = HotkeyAction::DPAD_DIGITAL;
-			currentState.dpad = 0;
+			currentState.dpadInputs = 0;
 		} else if (isDpadUpPressed()) {
 			action = HotkeyAction::HOME_BUTTON;
-			currentState.dpad = 0;
-			currentState.buttons |= GAMEPAD_BUTTON_13;
+			currentState.dpadInputs = 0;
+			currentState.buttonInputs |= GAMEPAD_BUTTON_13;
 		}
 	}
 
