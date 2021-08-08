@@ -189,7 +189,7 @@ HotkeyAction Gamepad::hotkey() {
 		}
 
 		if (lastSOCDMode != socdMode)
-			Storage.put(STORAGE_DPAD_MODE_INDEX, socdMode);
+			Storage.put(STORAGE_SOCD_MODE_INDEX, socdMode);
 
 	}
 
