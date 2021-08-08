@@ -2,6 +2,8 @@
  * Gamepad
  * 
  * Base class for implementing a gamepad/controller.
+ * 
+ * Depends on the Arduino EEPROM library.
  ************************************************************************************/
 
 #ifndef _GAMEPAD_
@@ -13,14 +15,12 @@
 #include "DS3Report.h"
 #include "SwitchReport.h"
 #include "XInputReport.h"
+#include "PersistentStorage.h"
+#include "SOCDCleaner.h"
 
 #ifndef DEBOUNCE_MILLIS
 #define DEBOUNCE_MILLIS 0
 #endif
-
-#define EEPROM_INPUT_MODE_INDEX 0
-#define EEPROM_DPAD_MODE_INDEX  1
-#define EEPROM_LED_MODE_INDEX   2
 
 class Gamepad {
 	public:
@@ -36,7 +36,12 @@ class Gamepad {
 		GamepadState currentState;
 		DpadMode dpadMode;
 		InputMode inputMode;
-		uint8_t ledMode = 0;
+		SOCDMode socdMode;
+
+		/**
+		 * Load the saved configuration from persitent storage
+		 */
+		virtual void load();
 
 		/**
 		 * Perform pin setup and any other initialization the board requires
@@ -49,9 +54,9 @@ class Gamepad {
 		virtual void read();
 
 		/**
-		 * Returns if the function button/hotkey is pressed, override in derived board class
+		 * Checks and executes any hotkey being pressed
 		 */
-		virtual bool isFunctionPressed();
+		virtual HotkeyAction hotkey();
 
 		/**
 		 * Run debouncing algorithm against raw inputs in the current GamepadState
@@ -64,11 +69,24 @@ class Gamepad {
 		void process();
 
 		/**
+		 * Checks persistent storage and hotkeys to determine the input mode to use
+		 */
+		void configureInputMode();
+
+		/**
 		 * Send the latest GamepadState to the USB Host.
 		 */
 		void update();
 
-		HotkeyAction checkHotkeys();
+		/**
+		 * Returns if the function button/hotkey is pressed, override in derived board class
+		 */
+		virtual bool isDpadHotkeyPressed();
+
+		/**
+		 * Returns if the function button/hotkey is pressed, override in derived board class
+		 */
+		virtual bool isSOCDHotkeyPressed();
 
 		DS3Report getDS3Report();
 		SwitchInputReport getSwitchReport();

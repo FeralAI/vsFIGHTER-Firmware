@@ -1,26 +1,14 @@
 #include "Gamepad.h"
 
-HotkeyAction Gamepad::checkHotkeys() {
-	HotkeyAction action = HotkeyAction::NONE;
-	if (isFunctionPressed()) {
-		currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
-		if (isDpadLeftPressed()) {
-			action = HotkeyAction::DPAD_LEFT_ANALOG;
-			currentState.dpadInputs = 0;
-		} else if (isDpadRightPressed()) {
-			action = HotkeyAction::DPAD_RIGHT_ANALOG;
-			currentState.dpadInputs = 0;
-		} else if (isDpadDownPressed()) {
-			action = HotkeyAction::DPAD_DIGITAL;
-			currentState.dpadInputs = 0;
-		} else if (isDpadUpPressed()) {
-			action = HotkeyAction::HOME_BUTTON;
-			currentState.dpadInputs = 0;
-			currentState.buttonInputs |= GAMEPAD_BUTTON_13;
-		}
-	}
+void Gamepad::configureInputMode() {
+	read();
 
-	return action;
+	InputMode lastInputMode = inputMode;
+	if (isRightStickButtonPressed()) inputMode = InputMode::DUALSHOCK3;
+	else if (isSelectPressed())      inputMode = InputMode::SWITCH;
+	else if (isStartPressed())       inputMode = InputMode::XINPUT;
+	if (lastInputMode != inputMode)
+		Storage.put(STORAGE_INPUT_MODE_INDEX, inputMode);
 }
 
 void Gamepad::debounce() {
@@ -161,8 +149,72 @@ XInputReport Gamepad::getXInputReport() {
 	return report;
 }
 
-bool Gamepad::isFunctionPressed() {
+HotkeyAction Gamepad::hotkey() {
+	HotkeyAction action = HotkeyAction::NONE;
+	if (isDpadHotkeyPressed()) {
+		DpadMode lastDpadMode = dpadMode;
+		currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
+		if (isDpadLeftPressed()) {
+			action = HotkeyAction::DPAD_LEFT_ANALOG;
+			dpadMode = DpadMode::LEFT_ANALOG;
+			currentState.dpadInputs = 0;
+		} else if (isDpadRightPressed()) {
+			action = HotkeyAction::DPAD_RIGHT_ANALOG;
+			dpadMode = DpadMode::RIGHT_ANALOG;
+			currentState.dpadInputs = 0;
+		} else if (isDpadDownPressed()) {
+			action = HotkeyAction::DPAD_DIGITAL;
+			dpadMode = DpadMode::DIGITAL;
+			currentState.dpadInputs = 0;
+		} else if (isDpadUpPressed()) {
+			action = HotkeyAction::HOME_BUTTON;
+			currentState.dpadInputs = 0;
+			currentState.buttonInputs |= GAMEPAD_BUTTON_13; // Press the Home button
+		}
+
+		if (lastDpadMode != dpadMode)
+			Storage.put(STORAGE_DPAD_MODE_INDEX, dpadMode);
+
+	} else if (isSOCDHotkeyPressed()) {
+		SOCDMode lastSOCDMode = socdMode;
+		currentState.buttonInputs &= ~(GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
+		if (isDpadUpPressed()) {
+			action = HotkeyAction::SOCD_HITBOX;
+			socdMode = SOCDMode::HITBOX;
+			currentState.dpadInputs = 0;
+		} else if (isDpadDownPressed()) {
+			action = HotkeyAction::SOCD_NEUTRAL;
+			socdMode = SOCDMode::NEUTRAL;
+			currentState.dpadInputs = 0;
+		}
+
+		if (lastSOCDMode != socdMode)
+			Storage.put(STORAGE_DPAD_MODE_INDEX, socdMode);
+
+	}
+
+	return action;
+}
+
+bool Gamepad::isDpadHotkeyPressed() {
 	return (currentState.buttonInputs & (GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10)) == (GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
+}
+
+bool Gamepad::isSOCDHotkeyPressed() {
+	return (currentState.buttonInputs & (GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12)) == (GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
+}
+
+void Gamepad::load() {
+	Storage.get(STORAGE_INPUT_MODE_INDEX, inputMode);
+	Storage.get(STORAGE_DPAD_MODE_INDEX, dpadMode);
+	Storage.get(STORAGE_SOCD_MODE_INDEX, socdMode);
+
+	if (inputMode < InputMode::XINPUT || inputMode > InputMode::DUALSHOCK3)
+		inputMode = InputMode::XINPUT;
+	if (dpadMode < DpadMode::DIGITAL || dpadMode > DpadMode::RIGHT_ANALOG)
+		dpadMode = DpadMode::DIGITAL;
+	if (socdMode < SOCDMode::HITBOX || socdMode > SOCDMode::NEUTRAL)
+		socdMode = SOCDMode::HITBOX;
 }
 
 void Gamepad::process() {
@@ -170,6 +222,7 @@ void Gamepad::process() {
 	currentState.buttons = currentState.buttonInputs;
 
 	currentState.dpad = runSOCD(
+		socdMode,
 		currentState.dpadInputs & GAMEPAD_DPAD_UP,
 		currentState.dpadInputs & GAMEPAD_DPAD_DOWN,
 		currentState.dpadInputs & GAMEPAD_DPAD_LEFT,

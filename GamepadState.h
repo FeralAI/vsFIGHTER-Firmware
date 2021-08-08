@@ -71,6 +71,8 @@ typedef enum {
 	DPAD_RIGHT_ANALOG = 0x04,
 	HOME_BUTTON       = 0x08,
 	CAPTURE_BUTTON    = 0x10,
+	SOCD_HITBOX       = 0x20,
+	SOCD_NEUTRAL      = 0x40,
 } HotkeyAction;
 
 typedef struct {
@@ -129,21 +131,6 @@ __attribute__((always_inline)) inline uint16_t dpadToAnalogY(uint8_t dpad) {
 		default:
 			return GAMEPAD_AXIS_MID;
 	}
-}
-
-/**
- * Run the SOCD cleaner
- */
-__attribute__((always_inline)) inline uint8_t runSOCD(bool up, bool down, bool left, bool right) {
-	if (up && down)    { down = false; }
-	if (left && right) { left = false; right = false; }
-
-	return 0
-		^ (up ? GAMEPAD_DPAD_UP : 0)
-		^ (down ? GAMEPAD_DPAD_DOWN : 0)
-		^ (left ? GAMEPAD_DPAD_LEFT : 0)
-		^ (right ? GAMEPAD_DPAD_RIGHT : 0)
-	;
 }
 
 #endif
