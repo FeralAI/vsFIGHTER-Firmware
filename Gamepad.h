@@ -16,7 +16,6 @@
 #include "SwitchReport.h"
 #include "XInputReport.h"
 #include "PersistentStorage.h"
-#include "SOCDCleaner.h"
 
 #ifndef DEBOUNCE_MILLIS
 #define DEBOUNCE_MILLIS 0
@@ -34,9 +33,13 @@ class Gamepad {
 
 		GamepadState previousState;
 		GamepadState currentState;
-		DpadMode dpadMode;
-		InputMode inputMode;
-		SOCDMode socdMode;
+
+		DpadMode dpadMode        = DpadMode::DIGITAL;
+		InputMode inputMode      = InputMode::XINPUT;
+		SOCDMode socdMode        = SOCDMode::HITBOX;
+		bool hasAnalogTriggers   = false;
+		bool hasLeftAnalogStick  = false;
+		bool hasRightAnalogStick = false;
 
 		/**
 		 * Load the saved configuration from persitent storage

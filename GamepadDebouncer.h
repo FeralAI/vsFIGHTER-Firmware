@@ -10,7 +10,9 @@ class GamepadDebouncer : public Debouncer {
 	public:
 		GamepadDebouncer();
 		GamepadDebouncer(uint16_t m, uint16_t i = 0, bool d = false)
-			: inputMask(m), interval_millis(i), isDpad(d) { };
+			: inputMask(m), isDpad(d) {
+			interval_millis = i;
+		};
 
 		bool isDpad;
 		uint16_t inputMask;
@@ -20,7 +22,6 @@ class GamepadDebouncer : public Debouncer {
 		}
 
 	protected:
-		uint16_t interval_millis;
 		GamepadState *gamepadState;
 
 		virtual bool readCurrentState();

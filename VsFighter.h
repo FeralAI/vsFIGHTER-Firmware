@@ -37,7 +37,11 @@
 
 class VsFighter: public Gamepad {
 	public:
-		VsFighter() : Gamepad() { }
+		VsFighter() : Gamepad() {
+			hasAnalogTriggers = false;
+			hasLeftAnalogStick = false;
+			hasRightAnalogStick = false;
+		}
 
 		/**
 		 * Perform pin setup and any other initialization the board requires
@@ -62,7 +66,6 @@ class VsFighter: public Gamepad {
 			uint8_t ports[] = { ~PINB, ~PIND, ~PINF };
 
 			// No analog triggers
-			currentState.hasAnalogTriggers = false;
 			currentState.lt = 0;
 			currentState.rt = 0;
 

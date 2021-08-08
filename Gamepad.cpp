@@ -8,7 +8,7 @@ void Gamepad::configureInputMode() {
 	else if (isSelectPressed())      inputMode = InputMode::SWITCH;
 	else if (isStartPressed())       inputMode = InputMode::XINPUT;
 	if (lastInputMode != inputMode)
-		Storage.put(STORAGE_INPUT_MODE_INDEX, inputMode);
+		Storage.setInputMode(inputMode);
 }
 
 void Gamepad::debounce() {
@@ -138,7 +138,7 @@ XInputReport Gamepad::getXInputReport() {
 	;
 
 	// Handle trigger values
-	if (currentState.hasAnalogTriggers) {
+	if (hasAnalogTriggers) {
 		report.lt = currentState.lt;                                         // Left Trigger (analog)
 		report.rt = currentState.rt;                                         // Right Trigger (analog)
 	} else {
@@ -173,7 +173,7 @@ HotkeyAction Gamepad::hotkey() {
 		}
 
 		if (lastDpadMode != dpadMode)
-			Storage.put(STORAGE_DPAD_MODE_INDEX, dpadMode);
+			Storage.setDpadMode(dpadMode);
 
 	} else if (isSOCDHotkeyPressed()) {
 		SOCDMode lastSOCDMode = socdMode;
@@ -186,10 +186,14 @@ HotkeyAction Gamepad::hotkey() {
 			action = HotkeyAction::SOCD_NEUTRAL;
 			socdMode = SOCDMode::NEUTRAL;
 			currentState.dpadInputs = 0;
+		} else if (isDpadLeftPressed()) {
+			action = HotkeyAction::SOCD_LAST_INPUT;
+			socdMode = SOCDMode::LAST_INPUT;
+			currentState.dpadInputs = 0;
 		}
 
 		if (lastSOCDMode != socdMode)
-			Storage.put(STORAGE_SOCD_MODE_INDEX, socdMode);
+			Storage.setSOCDMode(socdMode);
 
 	}
 
@@ -205,50 +209,44 @@ bool Gamepad::isSOCDHotkeyPressed() {
 }
 
 void Gamepad::load() {
-	Storage.get(STORAGE_INPUT_MODE_INDEX, inputMode);
-	Storage.get(STORAGE_DPAD_MODE_INDEX, dpadMode);
-	Storage.get(STORAGE_SOCD_MODE_INDEX, socdMode);
-
-	if (inputMode < InputMode::XINPUT || inputMode > InputMode::DUALSHOCK3)
-		inputMode = InputMode::XINPUT;
-	if (dpadMode < DpadMode::DIGITAL || dpadMode > DpadMode::RIGHT_ANALOG)
-		dpadMode = DpadMode::DIGITAL;
-	if (socdMode < SOCDMode::HITBOX || socdMode > SOCDMode::NEUTRAL)
-		socdMode = SOCDMode::HITBOX;
+	dpadMode  = Storage.getDpadMode();
+	inputMode = Storage.getInputMode();
+	socdMode  = Storage.getSOCDMode();
 }
 
 void Gamepad::process() {
 	// Set button states
 	currentState.buttons = currentState.buttonInputs;
-
-	currentState.dpad = runSOCD(
-		socdMode,
-		currentState.dpadInputs & GAMEPAD_DPAD_UP,
-		currentState.dpadInputs & GAMEPAD_DPAD_DOWN,
-		currentState.dpadInputs & GAMEPAD_DPAD_LEFT,
-		currentState.dpadInputs & GAMEPAD_DPAD_RIGHT
-	);
+	currentState.dpad = runSOCD(socdMode, currentState.dpadInputs);
 
 	switch (dpadMode) {
 		case DpadMode::LEFT_ANALOG:
 			currentState.lx = dpadToAnalogX(currentState.dpad);
 			currentState.ly = dpadToAnalogY(currentState.dpad);
-			currentState.rx = GAMEPAD_AXIS_MID;
-			currentState.ry = GAMEPAD_AXIS_MID;
+			if (!hasRightAnalogStick) {
+				currentState.rx = GAMEPAD_AXIS_MID;
+				currentState.ry = GAMEPAD_AXIS_MID;
+			}
 			currentState.dpad = 0;
 			break;
 		case DpadMode::RIGHT_ANALOG:
-			currentState.lx = GAMEPAD_AXIS_MID;
-			currentState.ly = GAMEPAD_AXIS_MID;
+			if (!hasLeftAnalogStick) {
+				currentState.lx = GAMEPAD_AXIS_MID;
+				currentState.ly = GAMEPAD_AXIS_MID;
+			}
 			currentState.rx = dpadToAnalogX(currentState.dpad);
 			currentState.ry = dpadToAnalogY(currentState.dpad);
 			currentState.dpad = 0;
 			break;
 		default:
-			currentState.lx = GAMEPAD_AXIS_MID;
-			currentState.ly = GAMEPAD_AXIS_MID;
-			currentState.rx = GAMEPAD_AXIS_MID;
-			currentState.ry = GAMEPAD_AXIS_MID;
+			if (!hasLeftAnalogStick) {
+				currentState.lx = GAMEPAD_AXIS_MID;
+				currentState.ly = GAMEPAD_AXIS_MID;
+			}
+			if (!hasRightAnalogStick) {
+				currentState.rx = GAMEPAD_AXIS_MID;
+				currentState.ry = GAMEPAD_AXIS_MID;
+			}
 			break;
 	}
 }

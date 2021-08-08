@@ -65,6 +65,12 @@ typedef enum {
 } DpadMode;
 
 typedef enum {
+	HITBOX,     // U+D=U, L+R=N
+	NEUTRAL,    // U+D=N, L+R=N
+	LAST_INPUT, // U>D=D, L>R=R (Last Input Priority, aka Last Win)
+} SOCDMode;
+
+typedef enum {
 	NONE              = 0x00,
 	DPAD_DIGITAL      = 0x01,
 	DPAD_LEFT_ANALOG  = 0x02,
@@ -73,6 +79,7 @@ typedef enum {
 	CAPTURE_BUTTON    = 0x10,
 	SOCD_HITBOX       = 0x20,
 	SOCD_NEUTRAL      = 0x40,
+	SOCD_LAST_INPUT   = 0x80,
 } HotkeyAction;
 
 typedef struct {
@@ -88,8 +95,12 @@ typedef struct {
 	uint16_t ry;            // Right analog Y-axis
 	uint8_t lt;             // Left analog trigger
 	uint8_t rt;             // Right analog trigger
-	bool hasAnalogTriggers; // Flag to indicate how to process trigger values
 } GamepadState;
+
+/**
+ * Var to track the last dpad state for LAST_INPUT SOCD
+ */
+static uint8_t lastDpadValue;
 
 /**
  * Check two GamepadStates for equality
@@ -131,6 +142,63 @@ __attribute__((always_inline)) inline uint16_t dpadToAnalogY(uint8_t dpad) {
 		default:
 			return GAMEPAD_AXIS_MID;
 	}
+}
+
+/**
+ * Run the SOCD cleaner
+ */
+__attribute__((always_inline)) inline uint8_t runSOCD(SOCDMode mode, uint8_t dpadValues) {
+	uint8_t newValues = dpadValues;
+
+	switch (mode) {
+
+		case HITBOX:
+			if ((dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) == (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN))
+				newValues &= ~(GAMEPAD_DPAD_DOWN);
+			if ((dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) == (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT))
+				newValues &= ~(GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT);
+			break;
+
+		case NEUTRAL:
+			if ((dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) == (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN))
+				newValues &= ~(GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN);
+			if ((dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) == (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT))
+				newValues &= ~(GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT);
+			break;
+
+		case LAST_INPUT:
+			if ((dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) == (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) {
+				switch (lastDpadValue & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) {
+					case GAMEPAD_DPAD_UP:
+						newValues &= ~(GAMEPAD_DPAD_UP);
+						break;
+					case GAMEPAD_DPAD_DOWN:
+						newValues &= ~(GAMEPAD_DPAD_DOWN);
+						break;
+					default:
+						newValues &= ~(GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN);
+						break;
+				}
+			}
+			if ((dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) == (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
+				switch (lastDpadValue & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
+					case GAMEPAD_DPAD_LEFT:
+						newValues &= ~(GAMEPAD_DPAD_LEFT);
+						break;
+					case GAMEPAD_DPAD_RIGHT:
+						newValues &= ~(GAMEPAD_DPAD_RIGHT);
+						break;
+					default:
+						newValues &= ~(GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT);
+						break;
+				}
+			}
+			lastDpadValue = dpadValues;
+			break;
+
+	}
+
+	return newValues;
 }
 
 #endif
