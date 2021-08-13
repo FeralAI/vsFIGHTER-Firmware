@@ -3,23 +3,23 @@
 
 #include <stdint.h>
 
-#define DS3_BUTTON_SELECT_MASK   0x01
-#define DS3_BUTTON_L3_MASK       0x02
-#define DS3_BUTTON_R3_MASK       0x04
-#define DS3_BUTTON_START_MASK    0x08
-#define DS3_DPAD_UP_MASK         0x10
-#define DS3_DPAD_RIGHT_MASK      0x20
-#define DS3_DPAD_DOWN_MASK       0x40
-#define DS3_DPAD_LEFT_MASK       0x80
-#define DS3_BUTTON_L2_MASK       0x100
-#define DS3_BUTTON_R1_MASK       0x200
-#define DS3_BUTTON_L1_MASK       0x400
-#define DS3_BUTTON_R2_MASK       0x800
-#define DS3_BUTTON_TRIANGLE_MASK 0x1000
-#define DS3_BUTTON_CIRCLE_MASK   0x2000
-#define DS3_BUTTON_CROSS_MASK    0x4000
-#define DS3_BUTTON_SQUARE_MASK   0x8000
-#define DS3_BUTTON_PS_MASK       0x10000
+#define DS3_BUTTON_SELECT_MASK   (1U <<  0)
+#define DS3_BUTTON_L3_MASK       (1U <<  1)
+#define DS3_BUTTON_R3_MASK       (1U <<  2)
+#define DS3_BUTTON_START_MASK    (1U <<  3)
+#define DS3_DPAD_UP_MASK         (1U <<  4)
+#define DS3_DPAD_RIGHT_MASK      (1U <<  5)
+#define DS3_DPAD_DOWN_MASK       (1U <<  6)
+#define DS3_DPAD_LEFT_MASK       (1U <<  7)
+#define DS3_BUTTON_L2_MASK       (1U <<  8)
+#define DS3_BUTTON_R1_MASK       (1U <<  9)
+#define DS3_BUTTON_L1_MASK       (1U << 10)
+#define DS3_BUTTON_R2_MASK       (1U << 11)
+#define DS3_BUTTON_TRIANGLE_MASK (1U << 12)
+#define DS3_BUTTON_CIRCLE_MASK   (1U << 13)
+#define DS3_BUTTON_CROSS_MASK    (1U << 14)
+#define DS3_BUTTON_SQUARE_MASK   (1U << 15)
+#define DS3_BUTTON_PS_MASK       (1U << 16)
 
 typedef struct {
 	uint8_t reportId;

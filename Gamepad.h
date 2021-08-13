@@ -15,7 +15,7 @@
 #include "DS3Report.h"
 #include "SwitchReport.h"
 #include "XInputReport.h"
-#include "PersistentStorage.h"
+#include "GamepadStorage.h"
 
 #ifndef DEBOUNCE_MILLIS
 #define DEBOUNCE_MILLIS 0

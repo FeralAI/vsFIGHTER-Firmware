@@ -45,8 +45,8 @@ enum StringDescriptors_t {
 // HID Endpoint Size
 // The Switch -needs- this to be 64.
 // The Wii U is flexible, allowing us to use the default of 8 (which did not match the original Hori descriptors).
-#define JOYSTICK_EPSIZE_SWITCH           64
 #define JOYSTICK_EPSIZE_DS3              64
+#define JOYSTICK_EPSIZE_SWITCH           64
 #define JOYSTICK_EPSIZE_XINPUT           20
 // Descriptor Header Type - HID Class HID Descriptor
 #define DTYPE_HID                 0x21

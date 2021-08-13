@@ -256,23 +256,14 @@ void Gamepad::read() { }
 void Gamepad::setup() { }
 
 void Gamepad::update() {
-	if (areStatesEqual(currentState, previousState)) {
-		// No state change, just maintain USB connection
-		USB_USBTask();
-	} else {
-		// Gamepad state changed, send inputs to host
-		switch (inputMode) {
-			case InputMode::XINPUT:
-				sendXInputReport(&getXInputReport());
-				break;
-			case InputMode::SWITCH:
-				sendSwitchReport(&getSwitchReport());
-				break;
-			// case InputMode::DUALSHOCK3:
-			// 	sendDS3Report(&getDS3Report());
-			// 	break;
-		}
+	switch (inputMode) {
+		case InputMode::XINPUT:
+			sendXInputReport(&getXInputReport());
+			break;
+		case InputMode::SWITCH:
+			sendSwitchReport(&getSwitchReport());
+			break;
 	}
 
-	previousState = currentState;
+	memcpy(&previousState, &currentState, sizeof(GamepadState));
 }

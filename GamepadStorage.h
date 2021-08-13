@@ -8,7 +8,7 @@
 #include <EEPROM.h>
 #include "GamepadState.h"
 
-class PersistentStorage {
+class GamepadStorage {
 	public:
 		DpadMode getDpadMode() {
 			DpadMode mode = DpadMode::DIGITAL;
@@ -44,18 +44,18 @@ class PersistentStorage {
 		/**
 		 * Wrapper for "get" call to storage API
 		 */
-		template <typename T> T PersistentStorage::get(int index, T &value) {
+		template <typename T> T GamepadStorage::get(int index, T &value) {
 			return EEPROM.get(index, value);
 		}
 
 		/**
 		 * Wrapper for "set" call to storage API
 		 */
-		template <typename T> T PersistentStorage::set(int index, const T &value) {
+		template <typename T> T GamepadStorage::set(int index, const T &value) {
 			return EEPROM.put(index, value);
 		}
 };
 
-static PersistentStorage Storage;
+static GamepadStorage Storage;
 
 #endif
