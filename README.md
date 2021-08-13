@@ -54,7 +54,7 @@ Simultaneous Opposite Cardinal Direction (SOCD) cleaning will ensure the control
 
 * **`LS + RS + UP`** - **Hitbox mode**: Up + Down = Up, Left + Right = Neutral
 * **`LS + RS + DOWN`** - **Neutral mode**: Up + Down = Neutral, Left + Right = Neutral
-* **`LS + RS + UP`** - **Last Input Priority (Last Win)**: Hold Up then hold Down = Down, Hold Left then hold Right = Right, Left
+* **`LS + RS + LEFT`** - **Last Input Priority (Last Win)**: Hold Up then hold Down = Down, Hold Left then hold Right = Right, Left
 
 SOCD mode is saved across power cycles.
 
