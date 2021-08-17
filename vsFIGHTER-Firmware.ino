@@ -1,5 +1,7 @@
 #include <LUFA.h>
 
+#define FIRMWARE_VERSION "1.0.1"
+
 // Override default debounce time set for the board, 0 to disable
 #define DEBOUNCE_MILLIS 5
 

@@ -1,10 +1,8 @@
 # vsFIGHTER Firmware
 
-Firmware for the [vsFIGHTER](https://github.com/LeafCutterLabs/vsFIGHTER) by [Leaf Cutter Labs](https://github.com/LeafCutterLabs) supporting XInput and Nintendo Switch.
+Firmware for the [vsFIGHTER](https://github.com/LeafCutterLabs/vsFIGHTER) by [Leaf Cutter Labs](https://github.com/LeafCutterLabs) supporting XInput (PC, Android, Raspberry Pi, etc.) and Nintendo Switch. Works with both the standard and Hitbox variants of the vsFIGHTER.
 
 ## Usage
-
-### Layout
 
 ![vsFIGHTER layout](.assets/images/vsFIGHTER-layout.jpg)
 
@@ -60,9 +58,24 @@ Simultaneous Opposite Cardinal Direction (SOCD) cleaning will ensure the control
 
 SOCD mode is saved across power cycles.
 
+## Performance
+
+Input latency is tested using the methodology outlined at [WydD's outstanding inputlag.science website](https://inputlag.science/controller/methodology), using the default 1000Hz (1ms) polling rate in the firmware.
+
+| XInput Mode | Hitbox SOCD | Neutral SOCD | Last Win SOCD |
+| - | - | - | - |
+| **polling** | 1 ms | 1 ms | 1 ms |
+| **min** | 0.56 ms | 0.56 ms | 0.56 ms |
+| **max** | 1.65 ms | 1.59 ms | 1.65 ms |
+| **avg** | 0.96 ms | 0.94 ms | 0.93 ms |
+| **stdev** | 0.28 ms | 0.27 ms | 0.28 ms |
+| **% on time** | 95.26% | 95.38% | 95.46% |
+| **%1f skip** | 4.74% | 4.62% | 4.54% |
+| **%2f skip** | 0% | 0% | 0% |
+
 ## Installation
 
-> NOTE: Any saved configuration will be cleared when reflashing the controller!
+> NOTE: Any saved modes/options may be cleared when reflashing the controller!
 
 An update package is provided that uses PowerShell and a bundled version of avrdude to handle flashing the microcontroller. If you're familiar with this process or on Linux/Mac, you can just extract the `.hex` file and flash it manually.
 
@@ -85,6 +98,11 @@ avrdude -v -Cavrdude.conf -patmega32u4 -cavr109 -P $port -b57600 -D -Uflash:w:vs
 If the firmware filename is different, make sure to update it before running the command...and that's it! If all went well you should see a success message at the end like `avrdude.exe: 15206 bytes of flash verified` and `avrdude.exe done.  Thank you.` If you have issues, try running through the steps again or [opening an issue](https://github.com/FeralAI/vsFIGHTER-Firmware/issues/new).
 
 ## Changelog
+
+### v1.0.1
+
+* Fixed mode activators (`Select + Start` and `LS + RS`) not registering inputs when pressed without selecting a mode
+* Slight latency reduction
 
 ### v1.0.0
 
