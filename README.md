@@ -48,13 +48,15 @@ You can switch between the 3 modes for the D-Pad **while the controller is in us
 * **`SELECT + START + LEFT`** - Emulate Left Analog stick
 * **`SELECT + START + RIGHT`** - Emulate Right Analog stick
 
+D-Pad mode is saved across power cycles.
+
 ### SOCD Modes
 
 Simultaneous Opposite Cardinal Direction (SOCD) cleaning will ensure the controller doesn't send invalid directional inputs to the computer/console, like Left + Right at the same time. There are 3 modes to choose from **while the controller is in use by pressing one of the following combinations:**
 
 * **`LS + RS + UP`** - **Hitbox mode**: Up + Down = Up, Left + Right = Neutral
 * **`LS + RS + DOWN`** - **Neutral mode**: Up + Down = Neutral, Left + Right = Neutral
-* **`LS + RS + UP`** - **Last Input Priority (Last Win)**: Hold Up then hold Down = Down, Hold Left then hold Right = Right, Left
+* **`LS + RS + LEFT`** - **Last Input Priority (Last Win)**: Hold Up then hold Down = Down, then release and re-press Up = Up. Applies to both axes.
 
 SOCD mode is saved across power cycles.
 
