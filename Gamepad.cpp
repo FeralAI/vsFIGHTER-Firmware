@@ -153,22 +153,25 @@ HotkeyAction Gamepad::hotkey() {
 	HotkeyAction action = HotkeyAction::NONE;
 	if (isDpadHotkeyPressed()) {
 		DpadMode lastDpadMode = dpadMode;
-		currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
 		if (isDpadLeftPressed()) {
 			action = HotkeyAction::DPAD_LEFT_ANALOG;
 			dpadMode = DpadMode::LEFT_ANALOG;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
 			currentState.dpadInputs = 0;
 		} else if (isDpadRightPressed()) {
 			action = HotkeyAction::DPAD_RIGHT_ANALOG;
 			dpadMode = DpadMode::RIGHT_ANALOG;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
 			currentState.dpadInputs = 0;
 		} else if (isDpadDownPressed()) {
 			action = HotkeyAction::DPAD_DIGITAL;
 			dpadMode = DpadMode::DIGITAL;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
 			currentState.dpadInputs = 0;
 		} else if (isDpadUpPressed()) {
 			action = HotkeyAction::HOME_BUTTON;
 			currentState.dpadInputs = 0;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_09 | GAMEPAD_BUTTON_10);
 			currentState.buttonInputs |= GAMEPAD_BUTTON_13; // Press the Home button
 		}
 
@@ -177,19 +180,21 @@ HotkeyAction Gamepad::hotkey() {
 
 	} else if (isSOCDHotkeyPressed()) {
 		SOCDMode lastSOCDMode = socdMode;
-		currentState.buttonInputs &= ~(GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
 		if (isDpadUpPressed()) {
 			action = HotkeyAction::SOCD_HITBOX;
 			socdMode = SOCDMode::HITBOX;
 			currentState.dpadInputs = 0;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
 		} else if (isDpadDownPressed()) {
 			action = HotkeyAction::SOCD_NEUTRAL;
 			socdMode = SOCDMode::NEUTRAL;
 			currentState.dpadInputs = 0;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
 		} else if (isDpadLeftPressed()) {
 			action = HotkeyAction::SOCD_LAST_INPUT;
 			socdMode = SOCDMode::LAST_INPUT;
 			currentState.dpadInputs = 0;
+			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
 		}
 
 		if (lastSOCDMode != socdMode)
