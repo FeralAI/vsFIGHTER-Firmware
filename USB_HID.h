@@ -22,9 +22,7 @@ void SetupHardware(InputMode inputMode);
 void HID_Task(void);
 
 // Supported report functions
-void sendDS3Report(DS3Report *reportData);
-void sendSwitchReport(SwitchInputReport *reportData);
-void sendXInputReport(XInputReport *reportData);
+void sendReport(void *data, uint8_t size);
 
 // USB device event handlers.
 void EVENT_USB_Device_Connect(void);

@@ -4,6 +4,10 @@ static DS3Report ds3ReportData;
 static SwitchInputReport switchReportData;
 static XInputReport xinputReportData;
 
+static void *reportData;
+static uint8_t reportSize;
+static uint8_t lastReportBytes[64] = { 0 };
+
 // Configures hardware and peripherals, such as the USB peripherals.
 void SetupHardware(InputMode inputMode) {
 
@@ -82,15 +86,9 @@ void HID_Task(void) {
 	if (USB_DeviceState != DEVICE_STATE_Configured)
 		return;
 
-	void* Address = &xinputReportData;
-	uint16_t Size = 20;
-
 	//no OUT endpoint for xinput in this firmware
 	bool isXInput = currentInputMode == XINPUT;
 	if (!isXInput){
-		Address = &switchReportData;
-		Size = sizeof(switchReportData);
-
 		// We'll start with the OUT endpoint.
 		Endpoint_SelectEndpoint(JOYSTICK_OUT_EPADDR);
 		// We'll check to see if we received something on the OUT endpoint.
@@ -116,29 +114,24 @@ void HID_Task(void) {
 	/* Check to see if the host is ready for another packet */
 	if (Endpoint_IsINReady()) {
 		/* Write Joystick Report Data */
-		Endpoint_Write_Stream_LE(Address, Size, NULL);
+		Endpoint_Write_Stream_LE(reportData, reportSize, NULL);
 
 		/* Finalize the stream transfer to send the last packet */
 		Endpoint_ClearIN();
+
+		/* Store last report bytes for comparison later */
+		memcpy(lastReportBytes, reportData, reportSize);
+
 		/* Clear the report data afterwards */
-		memset(Address, 0, Size);
+		memset(reportData, 0, reportSize);
 	}
 }
 
-void sendDS3Report(DS3Report *reportData) {
-	ds3ReportData = *reportData;
-	HID_Task();
-	USB_USBTask();
-}
+void sendReport(void *data, uint8_t size) {
+	reportData = data;
+	reportSize = size;
+	if (memcmp(lastReportBytes, reportData, reportSize) != 0)
+		HID_Task();
 
-void sendSwitchReport(SwitchInputReport *reportData) {
-	switchReportData = *reportData;
-	HID_Task();
-	USB_USBTask();
-}
-
-void sendXInputReport(XInputReport *reportData) {
-	xinputReportData = *reportData;
-	HID_Task();
 	USB_USBTask();
 }

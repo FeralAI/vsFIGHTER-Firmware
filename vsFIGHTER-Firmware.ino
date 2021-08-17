@@ -26,13 +26,6 @@ void setup() {
 
 
 void loop() {
-	static const uint8_t intervalMicros = 750;
-	static uint32_t lastUpdate = 0;
-
-	// Wait until we can send a report
-	if (micros() - lastUpdate < intervalMicros)
-		return;
-
 	// Read inputs
 	board.read();
 
@@ -49,7 +42,4 @@ void loop() {
 
 	// Run the USB task for this loop cycle
 	board.update();
-
-	// Update last update
-	lastUpdate = micros();
 }

@@ -263,12 +263,12 @@ void Gamepad::setup() { }
 void Gamepad::update() {
 	switch (inputMode) {
 		case InputMode::XINPUT:
-			sendXInputReport(&getXInputReport());
+			sendReport(&getXInputReport(), sizeof(XInputReport));
 			break;
 		case InputMode::SWITCH:
-			sendSwitchReport(&getSwitchReport());
+			sendReport(&getSwitchReport(), sizeof(SwitchInputReport));
 			break;
 	}
 
-	memcpy(&previousState, &currentState, sizeof(GamepadState));
+	memcpy(&previousState, &currentState, sizeof(currentState));
 }
