@@ -31,7 +31,7 @@ class GamepadStorage {
 		}
 
 		SOCDMode getSOCDMode() {
-			SOCDMode mode = SOCDMode::HITBOX;
+			SOCDMode mode = SOCDMode::UP_PRIORITY;
 			get(STORAGE_SOCD_MODE_INDEX, mode);
 			return mode;
 		}

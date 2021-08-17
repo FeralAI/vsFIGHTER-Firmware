@@ -39,9 +39,9 @@ typedef enum {
 } DpadMode;
 
 typedef enum {
-	HITBOX,     // U+D=U, L+R=N
-	NEUTRAL,    // U+D=N, L+R=N
-	LAST_INPUT, // U>D=D, L>R=R (Last Input Priority, aka Last Win)
+	UP_PRIORITY, // U+D=U, L+R=N
+	NEUTRAL,     // U+D=N, L+R=N
+	LAST_INPUT,  // U>D=D, L>R=R (Last Input Priority, aka Last Win)
 } SOCDMode;
 
 typedef enum {
@@ -59,7 +59,7 @@ typedef enum {
 	DPAD_RIGHT_ANALOG = 0x04,
 	HOME_BUTTON       = 0x08,
 	CAPTURE_BUTTON    = 0x10,
-	SOCD_HITBOX       = 0x20,
+	SOCD_UP_PRIORITY  = 0x20,
 	SOCD_NEUTRAL      = 0x40,
 	SOCD_LAST_INPUT   = 0x80,
 } HotkeyAction;
@@ -129,71 +129,46 @@ static uint8_t runSOCD(SOCDMode mode, uint8_t dpadValues) {
 	static Direction lastLR = Direction::DIRECTION_NONE;
 	uint8_t newValues = 0;
 
-	switch (mode) {
-
-		case HITBOX:
-			if ((dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) == (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN))
+	switch (dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) {
+		case (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN):
+			if (mode == SOCDMode::UP_PRIORITY) {
 				newValues |= GAMEPAD_DPAD_UP;
+				lastUD = Direction::DIRECTION_UP;
+			} else if (mode == SOCDMode::LAST_INPUT && lastUD != Direction::DIRECTION_NONE)
+				newValues |= (lastUD == Direction::DIRECTION_UP) ? GAMEPAD_DPAD_DOWN : GAMEPAD_DPAD_UP;
 			else
-				newValues &= (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN);
-			switch (dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
-				case GAMEPAD_DPAD_LEFT:
-					newValues |= GAMEPAD_DPAD_LEFT;
-					break;
-				case GAMEPAD_DPAD_RIGHT:
-					newValues |= GAMEPAD_DPAD_RIGHT;
-					break;
-			}
-			if ((dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) == (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT))
-				newValues &= ~(GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT);
+				lastUD = Direction::DIRECTION_NONE;
 			break;
-
-		case NEUTRAL:
-			switch (dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) {
-				case GAMEPAD_DPAD_UP:
-					newValues |= GAMEPAD_DPAD_UP;
-					break;
-				case GAMEPAD_DPAD_DOWN:
-					newValues |= GAMEPAD_DPAD_DOWN;
-					break;
-			}
-			switch (dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
-				case GAMEPAD_DPAD_LEFT:
-					newValues |= GAMEPAD_DPAD_LEFT;
-					break;
-				case GAMEPAD_DPAD_RIGHT:
-					newValues |= GAMEPAD_DPAD_RIGHT;
-					break;
-			}
+		case GAMEPAD_DPAD_UP:
+			newValues |= GAMEPAD_DPAD_UP;
+			lastUD = Direction::DIRECTION_UP;
 			break;
+		case GAMEPAD_DPAD_DOWN:
+			newValues |= GAMEPAD_DPAD_DOWN;
+			lastUD = Direction::DIRECTION_DOWN;
+			break;
+		default:
+			lastUD = Direction::DIRECTION_NONE;
+			break;
+	}
 
-		case LAST_INPUT:
-			switch (dpadValues & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) {
-				case (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN):
-					newValues |= (lastUD == Direction::DIRECTION_UP) ? GAMEPAD_DPAD_DOWN : GAMEPAD_DPAD_UP;
-					break;
-				case GAMEPAD_DPAD_UP:
-					newValues |= GAMEPAD_DPAD_UP;
-					lastUD = Direction::DIRECTION_UP;
-					break;
-				case GAMEPAD_DPAD_DOWN:
-					newValues |= GAMEPAD_DPAD_DOWN;
-					lastUD = Direction::DIRECTION_DOWN;
-					break;
-			}
-			switch (dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
-				case (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT):
-					newValues |= (lastLR == Direction::DIRECTION_LEFT) ? GAMEPAD_DPAD_RIGHT : GAMEPAD_DPAD_LEFT;
-					break;
-				case GAMEPAD_DPAD_LEFT:
-					newValues |= GAMEPAD_DPAD_LEFT;
-					lastLR = Direction::DIRECTION_LEFT;
-					break;
-				case GAMEPAD_DPAD_RIGHT:
-					newValues |= GAMEPAD_DPAD_RIGHT;
-					lastLR = Direction::DIRECTION_RIGHT;
-					break;
-			}
+	switch (dpadValues & (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
+		case (GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT):
+			if (mode == SOCDMode::LAST_INPUT && lastLR != Direction::DIRECTION_NONE)
+				newValues |= (lastLR == Direction::DIRECTION_LEFT) ? GAMEPAD_DPAD_RIGHT : GAMEPAD_DPAD_LEFT;
+			else
+				lastLR = Direction::DIRECTION_NONE;
+			break;
+		case GAMEPAD_DPAD_LEFT:
+			newValues |= GAMEPAD_DPAD_LEFT;
+			lastLR = Direction::DIRECTION_LEFT;
+			break;
+		case GAMEPAD_DPAD_RIGHT:
+			newValues |= GAMEPAD_DPAD_RIGHT;
+			lastLR = Direction::DIRECTION_RIGHT;
+			break;
+		default:
+			lastLR = Direction::DIRECTION_NONE;
 			break;
 	}
 

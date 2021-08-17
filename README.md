@@ -52,7 +52,7 @@ D-Pad mode is saved across power cycles.
 
 Simultaneous Opposite Cardinal Direction (SOCD) cleaning will ensure the controller doesn't send invalid directional inputs to the computer/console, like Left + Right at the same time. There are 3 modes to choose from **while the controller is in use by pressing one of the following combinations:**
 
-* **`LS + RS + UP`** - **Hitbox mode**: Up + Down = Up, Left + Right = Neutral
+* **`LS + RS + UP`** - **Up Priority mode**: Up + Down = Up, Left + Right = Neutral (Hitbox behavior)
 * **`LS + RS + DOWN`** - **Neutral mode**: Up + Down = Neutral, Left + Right = Neutral
 * **`LS + RS + LEFT`** - **Last Input Priority (Last Win)**: Hold Up then hold Down = Down, then release and re-press Up = Up. Applies to both axes.
 
@@ -62,7 +62,7 @@ SOCD mode is saved across power cycles.
 
 Input latency is tested using the methodology outlined at [WydD's outstanding inputlag.science website](https://inputlag.science/controller/methodology), using the default 1000Hz (1ms) polling rate in the firmware.
 
-| XInput Mode | Hitbox SOCD | Neutral SOCD | Last Win SOCD |
+| XInput Mode | Up Priority SOCD | Neutral SOCD | Last Win SOCD |
 | - | - | - | - |
 | **polling** | 1 ms | 1 ms | 1 ms |
 | **min** | 0.56 ms | 0.56 ms | 0.56 ms |
@@ -101,6 +101,7 @@ If the firmware filename is different, make sure to update it before running the
 
 ### v1.0.1
 
+* Fixed Up Priority (Hitbox) SOCD behavior
 * Fixed mode activators (`Select + Start` and `LS + RS`) not registering inputs when pressed without selecting a mode
 * Slight latency reduction
 

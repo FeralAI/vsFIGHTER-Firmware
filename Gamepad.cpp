@@ -181,8 +181,8 @@ HotkeyAction Gamepad::hotkey() {
 	} else if (isSOCDHotkeyPressed()) {
 		SOCDMode lastSOCDMode = socdMode;
 		if (isDpadUpPressed()) {
-			action = HotkeyAction::SOCD_HITBOX;
-			socdMode = SOCDMode::HITBOX;
+			action = HotkeyAction::SOCD_UP_PRIORITY;
+			socdMode = SOCDMode::UP_PRIORITY;
 			currentState.dpadInputs = 0;
 			currentState.buttonInputs &= ~(GAMEPAD_BUTTON_11 | GAMEPAD_BUTTON_12);
 		} else if (isDpadDownPressed()) {

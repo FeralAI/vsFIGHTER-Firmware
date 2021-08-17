@@ -36,7 +36,7 @@ class Gamepad {
 
 		DpadMode dpadMode        = DpadMode::DIGITAL;
 		InputMode inputMode      = InputMode::XINPUT;
-		SOCDMode socdMode        = SOCDMode::HITBOX;
+		SOCDMode socdMode        = SOCDMode::UP_PRIORITY;
 		bool hasAnalogTriggers   = false;
 		bool hasLeftAnalogStick  = false;
 		bool hasRightAnalogStick = false;
