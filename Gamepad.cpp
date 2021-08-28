@@ -70,9 +70,9 @@ SwitchInputReport Gamepad::getSwitchReport() {
 
 	// Direct assignments
 	report.LX = currentState.lx >> 8;
-	report.LY = currentState.ly >> 8;
+	report.LY = ~(currentState.ly >> 8);
 	report.RX = currentState.rx >> 8;
-	report.RY = currentState.ry >> 8;
+	report.RY = ~(currentState.ry >> 8);
 
 	// Handle HAT switch (D-Pad)
 	switch (currentState.dpad & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN | GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
