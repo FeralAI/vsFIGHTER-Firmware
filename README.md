@@ -99,6 +99,11 @@ If the firmware filename is different, make sure to update it before running the
 
 ## Changelog
 
+### v1.0.2
+
+* Fixed Switch LS/RS Y-axes being inverted
+* Should load reasonable default if invalid values are retrieved from EEPROM
+
 ### v1.0.1
 
 * Fixed Up Priority (Hitbox) SOCD behavior

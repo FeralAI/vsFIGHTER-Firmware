@@ -113,9 +113,9 @@ __attribute__((always_inline)) inline uint16_t dpadToAnalogX(uint8_t dpad) {
 __attribute__((always_inline)) inline uint16_t dpadToAnalogY(uint8_t dpad) {
 	switch (dpad & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN)) {
 		case GAMEPAD_DPAD_UP:
-			return GAMEPAD_AXIS_MAX;
-		case GAMEPAD_DPAD_DOWN:
 			return GAMEPAD_AXIS_MIN;
+		case GAMEPAD_DPAD_DOWN:
+			return GAMEPAD_AXIS_MAX;
 		default:
 			return GAMEPAD_AXIS_MID;
 	}

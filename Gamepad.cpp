@@ -70,9 +70,9 @@ SwitchInputReport Gamepad::getSwitchReport() {
 
 	// Direct assignments
 	report.LX = currentState.lx >> 8;
-	report.LY = ~(currentState.ly >> 8);
+	report.LY = currentState.ly >> 8;
 	report.RX = currentState.rx >> 8;
-	report.RY = ~(currentState.ry >> 8);
+	report.RY = currentState.ry >> 8;
 
 	// Handle HAT switch (D-Pad)
 	switch (currentState.dpad & (GAMEPAD_DPAD_UP | GAMEPAD_DPAD_DOWN | GAMEPAD_DPAD_LEFT | GAMEPAD_DPAD_RIGHT)) {
@@ -114,9 +114,9 @@ XInputReport Gamepad::getXInputReport() {
 
 	// Direct assignments
 	report.l_x = currentState.lx + -32768;
-	report.l_y = currentState.ly + -32768;
+	report.l_y = ~(currentState.ly) + -32768;
 	report.r_x = currentState.rx + -32768;
-	report.r_y = currentState.ry + -32768;
+	report.r_y = ~(currentState.ry) + -32768;
 
 	// Convert button states
 	report.digital_buttons_1 = currentState.dpad                                 // Dpad values, same as GamepadState
@@ -214,9 +214,15 @@ bool Gamepad::isSOCDHotkeyPressed() {
 }
 
 void Gamepad::load() {
-	dpadMode  = Storage.getDpadMode();
+	dpadMode = Storage.getDpadMode();
+	if (!(dpadMode >= DIGITAL && dpadMode <= DPAD_RIGHT_ANALOG))
+		dpadMode = DIGITAL;
 	inputMode = Storage.getInputMode();
-	socdMode  = Storage.getSOCDMode();
+	if (!(inputMode >= XINPUT && inputMode <= SWITCH))
+		inputMode = XINPUT;
+	socdMode = Storage.getSOCDMode();
+	if (!(socdMode >= UP_PRIORITY && socdMode <= LAST_INPUT))
+		socdMode = UP_PRIORITY;
 }
 
 void Gamepad::process() {
