@@ -1,6 +1,6 @@
 # vsFIGHTER Firmware
 
-Firmware for the [vsFIGHTER](https://github.com/LeafCutterLabs/vsFIGHTER) by [Leaf Cutter Labs](https://github.com/LeafCutterLabs) supporting XInput (PC, Android, Raspberry Pi, etc.) and Nintendo Switch. Works with both the standard and Hitbox variants of the vsFIGHTER.
+Firmware for the [vsFIGHTER](https://github.com/LeafCutterLabs/vsFIGHTER) by [Leaf Cutter Labs](https://github.com/LeafCutterLabs) supporting XInput (PC, Android, Raspberry Pi, etc.), DirectInput (PC, Mac, PS3) and Nintendo Switch. Works with both the standard and Hitbox variants of the vsFIGHTER.
 
 ## Usage
 
@@ -8,20 +8,20 @@ Firmware for the [vsFIGHTER](https://github.com/LeafCutterLabs/vsFIGHTER) by [Le
 
 The vsFIGHTER uses a standard 8-button fightstick layout with 4 additional tact switches for the auxiliary buttons. Here is a button mapping table for the supported input modes:
 
-| Generic | XInput | Switch |
-| ------- | ------ | ------ |
-| P1      | X      | Y      |
-| P2      | Y      | X      |
-| P3      | RB     | R      |
-| P4      | LB     | L      |
-| K1      | A      | B      |
-| K2      | B      | A      |
-| K3      | RT     | ZR     |
-| K4      | LT     | ZL     |
-| LS      | LS     | LS     |
-| RS      | RS     | RS     |
-| Select  | Back   | -      |
-| Start   | Start  | +      |
+| Generic | XInput | Switch  | PS3          | DirectInput  |
+| ------  | ------ | ------- | ------------ | ------------ |
+| K1      | A      | B       | Cross        | 2            |
+| K2      | B      | A       | Circle       | 3            |
+| P1      | X      | Y       | Square       | 1            |
+| P2      | Y      | X       | Triangle     | 4            |
+| P4      | LB     | L       | L1           | 5            |
+| P3      | RB     | R       | R1           | 6            |
+| K4      | LT     | ZL      | L2           | 7            |
+| K3      | RT     | ZR      | R2           | 8            |
+| Select  | Back   | Minus   | Select       | 9            |
+| Start   | Start  | Plus    | Start        | 10           |
+| LS      | LS     | LS      | L3           | 11           |
+| RS      | RS     | RS      | R3           | 12           |
 
 Any references to these buttons will use the `Generic` labels in this documentation.
 
@@ -29,10 +29,13 @@ Any references to these buttons will use the `Generic` labels in this documentat
 
 There is no dedicated Home/Logo button on the vsFIGTHTER, but you can activate it via the **`SELECT + START + UP`** button combination.
 
+> NOTE: This PS button in PS3 mode currently not supported.
+
 ### Input Modes
 
 To change the input mode, **hold one of the following buttons as the controller is plugged in:**
 
+* **`R3`** for Direct Input
 * **`SELECT`** for Nintendo Switch
 * **`START`** for XInput
 
@@ -75,29 +78,21 @@ Input latency is tested using the methodology outlined at [WydD's outstanding in
 
 ## Installation
 
-> NOTE: Any saved modes/options may be cleared when reflashing the controller!
+An installation package is available in zip format and uses a small wrapper utility called [TUFUpdater](https://github.com/FeralAI/TUFUpdater) to help automate the process.
 
-An update package is provided that uses PowerShell and a bundled version of avrdude to handle flashing the microcontroller. If you're familiar with this process or on Linux/Mac, you can just extract the `.hex` file and flash it manually.
+Perform the following steps to update your controller.
 
-**Using the Update Script**:
-
-Follow these steps to update your firmware:
-
-1. Download and extract the latest firmware update package from [Releases](https://github.com/FeralAI/vsFIGHTER-Firmware/releases).
-1. Press the reset button twice quickly on the bottom of your vsFIGHTER. You'll need a small screwdriver or toothpick to press it. This will put the microcontroller into bootloader mode for about 10 seconds.
-1. Run the `update.bat` file from the extracted firmware update folder. Make sure you do this within a few seconds of resetting the board otherwise it will fail.
-
-**Manual Installation**:
-
-You will need `avrdude` for your platform and the COM port of your board when in bootloader mode. Run the following command, replacing `$port` with your COM port (COM10 for example). Have this command ready and run it right after resetting into bootloader mode with the double press:
-
-```sh
-avrdude -v -Cavrdude.conf -patmega32u4 -cavr109 -P $port -b57600 -D -Uflash:w:vsFIGHTER-Firmware.hex:i
-```
-
-If the firmware filename is different, make sure to update it before running the command...and that's it! If all went well you should see a success message at the end like `avrdude.exe: 15206 bytes of flash verified` and `avrdude.exe done.  Thank you.` If you have issues, try running through the steps again or [opening an issue](https://github.com/FeralAI/vsFIGHTER-Firmware/issues/new).
+1. Extract the zip file to your PC.
+1. Navigate into the folder, then run `UpdateVSFighter.bat`. An alternative way to launch is to drag and drop the `.hex` file onto `TUFUpdater.exe`.
+1. Plug in your controller. You will be prompted to double press the reset button on your controller.
+1. TUFUpdater should automatically find your controller and begin the update process.
+1. After a few seconds you should see a message about flashing success.
 
 ## Changelog
+
+### v2.0.0
+
+* Integrate [MPG library](https://github.com/FeralAI/MPG) for input handling
 
 ### v1.0.2
 

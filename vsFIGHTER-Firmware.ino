@@ -1,47 +1,48 @@
-#define FIRMWARE_VERSION "1.0.2"
+#define FIRMWARE_VERSION "1.1.0"
+#define HAS_STORAGE true
 #define DEBOUNCE_MILLIS 5
 
+#include <MPG.h>
 #include <LUFA.h>
-#include "USB_HID.h"
-#include "VsFighter.h"
-
-VsFighter board(DEBOUNCE_MILLIS, true);
+#include "LUFADriver.h"
 
 uint32_t getMillis() { return millis(); }
 
+MPG mpg(DEBOUNCE_MILLIS, HAS_STORAGE);
 
-void setup() {
-	board.setup();
-	board.load();
-	board.read();
+void setup()
+{
+	mpg.setup();
+	mpg.load();
+	mpg.read();
 
-	InputMode inputMode = board.inputMode;
-	if (board.pressedR3())
+	InputMode inputMode = mpg.inputMode;
+	if (mpg.pressedR3())
 		inputMode = INPUT_MODE_HID;
-	else if (board.pressedS1())
+	else if (mpg.pressedS1())
 		inputMode = INPUT_MODE_SWITCH;
-	else if (board.pressedS2())
+	else if (mpg.pressedS2())
 		inputMode = INPUT_MODE_XINPUT;
 
-	if (inputMode != board.inputMode)
+	if (inputMode != mpg.inputMode)
 	{
-		board.inputMode = inputMode;
-		board.save();
+		mpg.inputMode = inputMode;
+		mpg.save();
 	}
 
-	SetupHardware(board.inputMode);
+	setupHardware(mpg.inputMode);
 }
 
-
-void loop() {
-	static const uint16_t reportSize = board.getReportSize();
+void loop()
+{
+	static const uint8_t reportSize = mpg.getReportSize();
 	static void *report;
 
-	board.read();
-	board.debounce();
-	board.hotkey();
-	board.process();
-	report = board.getReport();
+	mpg.read();
+	mpg.debounce();
+	mpg.hotkey();
+	mpg.process();
 
+	report = mpg.getReport();
 	sendReport(report, reportSize);
 }

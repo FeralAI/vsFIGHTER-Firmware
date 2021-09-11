@@ -6,13 +6,9 @@
 #define STORAGE_DPAD_MODE_INDEX 1  // 1 byte
 #define STORAGE_SOCD_MODE_INDEX 2  // 1 byte
 
-// No-op implmenetations
-
 GamepadStorage::GamepadStorage() { }
 
 void GamepadStorage::save() { }
-
-// "Real-op" implementations
 
 DpadMode GamepadStorage::getDpadMode() {
 	DpadMode mode = DEFAULT_DPAD_MODE;
