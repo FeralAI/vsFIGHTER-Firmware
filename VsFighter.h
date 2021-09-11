@@ -5,7 +5,8 @@
 #ifndef DEBOUNCE_MILLIS
 #define DEBOUNCE_MILLIS 5
 #endif
-#include "Gamepad.h"
+
+#include "MPG.h"
 
 // Pin mappings
 #define PORT_PIN_UP     PF7 // A0
@@ -35,9 +36,9 @@
 #define PORTD_INDEX 1
 #define PORTF_INDEX 2
 
-class VsFighter: public Gamepad {
+class VsFighter: public MPG {
 	public:
-		VsFighter() : Gamepad() {
+		VsFighter(uint16_t debounceMS, bool hasStorage) : MPG(debounceMS, hasStorage) {
 			hasAnalogTriggers = false;
 			hasLeftAnalogStick = false;
 			hasRightAnalogStick = false;
@@ -66,29 +67,27 @@ class VsFighter: public Gamepad {
 			uint8_t ports[] = { ~PINB, ~PIND, ~PINF };
 
 			// No analog triggers
-			currentState.lt = 0;
-			currentState.rt = 0;
+			state.lt = 0;
+			state.rt = 0;
 
 			// Gather raw inputs
-			currentState.dpadInputs = 0
-				| ((ports[PORTF_INDEX] >> PORT_PIN_UP    & 1) ? GAMEPAD_DPAD_UP    : 0)
-				| ((ports[PORTF_INDEX] >> PORT_PIN_DOWN  & 1) ? GAMEPAD_DPAD_DOWN  : 0)
-				| ((ports[PORTF_INDEX] >> PORT_PIN_LEFT  & 1) ? GAMEPAD_DPAD_LEFT  : 0)
-				| ((ports[PORTF_INDEX] >> PORT_PIN_RIGHT & 1) ? GAMEPAD_DPAD_RIGHT : 0);
-
-			currentState.buttonInputs = 0
-				| ((ports[PORTD_INDEX] >> PORT_PIN_K1 & 1)     ? GAMEPAD_BUTTON_01 : 0) // Generic: K1, Switch: B, Xbox: A
-				| ((ports[PORTD_INDEX] >> PORT_PIN_K2 & 1)     ? GAMEPAD_BUTTON_02 : 0) // Generic: K2, Switch: A, Xbox: B
-				| ((ports[PORTD_INDEX] >> PORT_PIN_P1 & 1)     ? GAMEPAD_BUTTON_03 : 0) // Generic: P1, Switch: Y, Xbox: X
-				| ((ports[PORTD_INDEX] >> PORT_PIN_P2 & 1)     ? GAMEPAD_BUTTON_04 : 0) // Generic: P2, Switch: X, Xbox: Y
-				| ((ports[PORTD_INDEX] >> PORT_PIN_P4 & 1)     ? GAMEPAD_BUTTON_05 : 0) // Generic: P4, Switch: L, Xbox: LB
-				| ((ports[PORTB_INDEX] >> PORT_PIN_P3 & 1)     ? GAMEPAD_BUTTON_06 : 0) // Generic: P3, Switch: R, Xbox: RB
-				| ((ports[PORTD_INDEX] >> PORT_PIN_K4 & 1)     ? GAMEPAD_BUTTON_07 : 0) // Generic: K4, Switch: ZL, Xbox: LT (Digital)
-				| ((ports[PORTB_INDEX] >> PORT_PIN_K3 & 1)     ? GAMEPAD_BUTTON_08 : 0) // Generic: K3, Switch: ZR, Xbox: RT (Digital)
-				| ((ports[PORTB_INDEX] >> PORT_PIN_SELECT & 1) ? GAMEPAD_BUTTON_09 : 0) // Generic: Select, Switch: -, Xbox: View
-				| ((ports[PORTB_INDEX] >> PORT_PIN_START & 1)  ? GAMEPAD_BUTTON_10 : 0) // Generic: Start, Switch: +, Xbox: Menu
-				| ((ports[PORTB_INDEX] >> PORT_PIN_LS & 1)     ? GAMEPAD_BUTTON_11 : 0) // All: Left Stick Click
-				| ((ports[PORTB_INDEX] >> PORT_PIN_RS & 1)     ? GAMEPAD_BUTTON_12 : 0) // All: Right Stick Click
+			state.buttons = 0
+				| ((ports[PORTF_INDEX] >> PORT_PIN_UP     & 1) ? GAMEPAD_MASK_UP    : 0)
+				| ((ports[PORTF_INDEX] >> PORT_PIN_DOWN   & 1) ? GAMEPAD_MASK_DOWN  : 0)
+				| ((ports[PORTF_INDEX] >> PORT_PIN_LEFT   & 1) ? GAMEPAD_MASK_LEFT  : 0)
+				| ((ports[PORTF_INDEX] >> PORT_PIN_RIGHT  & 1) ? GAMEPAD_MASK_RIGHT : 0)
+				| ((ports[PORTD_INDEX] >> PORT_PIN_K1     & 1) ? GAMEPAD_MASK_B1    : 0) // Generic: K1, Switch: B, Xbox: A
+				| ((ports[PORTD_INDEX] >> PORT_PIN_K2     & 1) ? GAMEPAD_MASK_B2    : 0) // Generic: K2, Switch: A, Xbox: B
+				| ((ports[PORTD_INDEX] >> PORT_PIN_P1     & 1) ? GAMEPAD_MASK_B3    : 0) // Generic: P1, Switch: Y, Xbox: X
+				| ((ports[PORTD_INDEX] >> PORT_PIN_P2     & 1) ? GAMEPAD_MASK_B4    : 0) // Generic: P2, Switch: X, Xbox: Y
+				| ((ports[PORTD_INDEX] >> PORT_PIN_P4     & 1) ? GAMEPAD_MASK_L1    : 0) // Generic: P4, Switch: L, Xbox: LB
+				| ((ports[PORTB_INDEX] >> PORT_PIN_P3     & 1) ? GAMEPAD_MASK_R1    : 0) // Generic: P3, Switch: R, Xbox: RB
+				| ((ports[PORTD_INDEX] >> PORT_PIN_K4     & 1) ? GAMEPAD_MASK_L2    : 0) // Generic: K4, Switch: ZL, Xbox: LT (Digital)
+				| ((ports[PORTB_INDEX] >> PORT_PIN_K3     & 1) ? GAMEPAD_MASK_R2    : 0) // Generic: K3, Switch: ZR, Xbox: RT (Digital)
+				| ((ports[PORTB_INDEX] >> PORT_PIN_SELECT & 1) ? GAMEPAD_MASK_S1    : 0) // Generic: Select, Switch: -, Xbox: View
+				| ((ports[PORTB_INDEX] >> PORT_PIN_START  & 1) ? GAMEPAD_MASK_S2    : 0) // Generic: Start, Switch: +, Xbox: Menu
+				| ((ports[PORTB_INDEX] >> PORT_PIN_LS     & 1) ? GAMEPAD_MASK_L3    : 0) // All: Left Stick Click
+				| ((ports[PORTB_INDEX] >> PORT_PIN_RS     & 1) ? GAMEPAD_MASK_R3    : 0) // All: Right Stick Click
 			;
 		}
 };

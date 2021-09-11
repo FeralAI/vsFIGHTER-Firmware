@@ -1,6 +1,6 @@
 #include "Descriptors.h"
 
-static InputMode inputMode = XINPUT;
+static InputMode inputMode = INPUT_MODE_XINPUT;
 
 // HID Descriptors.
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReportSwitch[] = {
@@ -486,7 +486,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex
 	uint16_t    Size    = NO_DESCRIPTOR;
 
 	switch (inputMode) {
-		case DUALSHOCK3:
+		case INPUT_MODE_HID:
 			switch (DescriptorType) {
 				case DTYPE_Device:
 					Address = &DeviceDescriptorDS3;
@@ -517,8 +517,6 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex
 					}
 					break;
 				case DTYPE_HID:
-					// Address = &ConfigurationDescriptorDS3;
-					// Size    = sizeof(USB_HID_Descriptor_HID_t);
 					Address = &HIDDescriptorDS3;
 					Size    = sizeof(HIDDescriptorDS3);
 					break;
@@ -529,7 +527,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex
 			}
 			break;
 
-		case SWITCH:
+		case INPUT_MODE_SWITCH:
 			switch (DescriptorType) {
 				case DTYPE_Device:
 					Address = &DeviceDescriptorSwitch;
@@ -570,7 +568,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue, const uint16_t wIndex
 			}
 			break;
 
-		case XINPUT:
+		case INPUT_MODE_XINPUT:
 		default:
 			switch (DescriptorType) {
 				case DTYPE_Device:

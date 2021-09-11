@@ -5,12 +5,8 @@
 #include "LUFAConfig.h"
 #include <avr/pgmspace.h>
 #include <LUFA/LUFA/Drivers/USB/USB.h>
-
-typedef enum {
-	XINPUT,
-	SWITCH,
-	DUALSHOCK3,
-} InputMode;
+#include "GamepadEnums.h"
+#include "GamepadDescriptors.h"
 
 // Type Defines
 // Device Configuration Descriptor Structure

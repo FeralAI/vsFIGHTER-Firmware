@@ -1,47 +1,47 @@
-#include <LUFA.h>
-
 #define FIRMWARE_VERSION "1.0.2"
-
-// Override default debounce time set for the board, 0 to disable
 #define DEBOUNCE_MILLIS 5
 
+#include <LUFA.h>
+#include "USB_HID.h"
 #include "VsFighter.h"
-VsFighter board;
+
+VsFighter board(DEBOUNCE_MILLIS, true);
+
+uint32_t getMillis() { return millis(); }
+
 
 void setup() {
-	// Configure board
 	board.setup();
-
-	// Get saved options
 	board.load();
+	board.read();
 
-	// Set input mode and persist if necessary
-	board.configureInputMode();
+	InputMode inputMode = board.inputMode;
+	if (board.pressedR3())
+		inputMode = INPUT_MODE_HID;
+	else if (board.pressedS1())
+		inputMode = INPUT_MODE_SWITCH;
+	else if (board.pressedS2())
+		inputMode = INPUT_MODE_XINPUT;
 
-	// Configure USB HID
+	if (inputMode != board.inputMode)
+	{
+		board.inputMode = inputMode;
+		board.save();
+	}
+
 	SetupHardware(board.inputMode);
-	GlobalInterruptEnable();
-
-	delay(50);
-	board.update();
 }
 
 
 void loop() {
-	// Read inputs
+	static const uint16_t reportSize = board.getReportSize();
+	static void *report;
+
 	board.read();
-
-#if DEBOUNCE_MILLIS > 0
-	// Run debouncing if required
 	board.debounce();
-#endif
-
-	// Check for hotkey changes, can react to returned hotkey action
 	board.hotkey();
-
-	// Process the raw inputs into a usable state
 	board.process();
+	report = board.getReport();
 
-	// Run the USB task for this loop cycle
-	board.update();
+	sendReport(report, reportSize);
 }

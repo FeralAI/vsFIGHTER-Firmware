@@ -5,9 +5,8 @@
 #include <avr/wdt.h>
 
 #include "Descriptors.h"
-#include "DS3Report.h"
-#include "SwitchReport.h"
-#include "XInputReport.h"
+#include "GamepadEnums.h"
+#include "GamepadDescriptors.h"
 
 static InputMode currentInputMode;
 

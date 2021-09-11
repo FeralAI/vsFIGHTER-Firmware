@@ -1,7 +1,7 @@
 #include "USB_HID.h"
 
-static DS3Report ds3ReportData;
-static SwitchInputReport switchReportData;
+static HIDReport ds3ReportData;
+static SwitchReport switchReportData;
 static XInputReport xinputReportData;
 
 static void *reportData;
@@ -22,6 +22,8 @@ void SetupHardware(InputMode inputMode) {
 	// We can then initialize our hardware and peripherals, including the USB stack.
 	// The USB stack should be initialized last.
 	USB_Init();
+
+	GlobalInterruptEnable();
 }
 
 // Fired to indicate that the device is enumerating.
@@ -37,15 +39,15 @@ void EVENT_USB_Device_Disconnect(void) {
 // Fired when the host set the current configuration of the USB device after enumeration.
 void EVENT_USB_Device_ConfigurationChanged(void) {
 	switch (currentInputMode) {
-		case DUALSHOCK3:
+		case INPUT_MODE_HID:
 			Endpoint_ConfigureEndpoint(JOYSTICK_OUT_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_DS3, 1);
 			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_DS3, 1);
 			break;
-		case SWITCH:
+		case INPUT_MODE_SWITCH:
 			Endpoint_ConfigureEndpoint(JOYSTICK_OUT_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_SWITCH, 1);
 			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_SWITCH, 1);
 			break;
-		case XINPUT:
+		case INPUT_MODE_XINPUT:
 		default:
 			Endpoint_ConfigureEndpoint((ENDPOINT_DIR_IN | 3), EP_TYPE_INTERRUPT, 32, 1);
 			Endpoint_ConfigureEndpoint(JOYSTICK_IN_EPADDR, EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE_XINPUT, 1);
@@ -56,7 +58,7 @@ void EVENT_USB_Device_ConfigurationChanged(void) {
 // Process control requests sent to the device from the USB host.
 void EVENT_USB_Device_ControlRequest(void) {
 	//No controlRequest received from the switch, so only handled in xinput mode
-	if (currentInputMode == XINPUT){
+	if (currentInputMode == INPUT_MODE_XINPUT){
 		/* Handle HID Class specific requests */
 		switch (USB_ControlRequest.bRequest) {
 		case HID_REQ_GetReport:
@@ -66,10 +68,10 @@ void EVENT_USB_Device_ControlRequest(void) {
 
 				/* Write the report data to the control endpoint */
 				switch (currentInputMode) {
-					case XINPUT:
+					case INPUT_MODE_XINPUT:
 						Endpoint_Write_Control_Stream_LE(&xinputReportData, 20);
 						break;
-					case DUALSHOCK3:
+					case INPUT_MODE_HID:
 						Endpoint_Write_Control_Stream_LE(&ds3ReportData, JOYSTICK_EPSIZE_DS3);
 						break;
 				}
@@ -87,7 +89,7 @@ void HID_Task(void) {
 		return;
 
 	//no OUT endpoint for xinput in this firmware
-	bool isXInput = currentInputMode == XINPUT;
+	bool isXInput = currentInputMode == INPUT_MODE_XINPUT;
 	if (!isXInput){
 		// We'll start with the OUT endpoint.
 		Endpoint_SelectEndpoint(JOYSTICK_OUT_EPADDR);
@@ -98,7 +100,7 @@ void HID_Task(void) {
 			if (Endpoint_IsReadWriteAllowed())
 			{
 				// We'll create a place to store our data received from the host.
-				SwitchOutputReport JoystickOutputData;
+				SwitchOutReport JoystickOutputData;
 				// We'll then take in that data, setting it up in our storage.
 				Endpoint_Read_Stream_LE(&JoystickOutputData, sizeof(JoystickOutputData), NULL);
 				// At this point, we can react to this data.
