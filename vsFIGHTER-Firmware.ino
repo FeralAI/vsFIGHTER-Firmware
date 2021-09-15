@@ -1,14 +1,13 @@
 #define FIRMWARE_VERSION "1.1.0"
-#define HAS_STORAGE true
 #define DEBOUNCE_MILLIS 5
 
-#include <MPG.h>
+#include <MPGS.h>
 #include <LUFA.h>
 #include "LUFADriver.h"
 
 uint32_t getMillis() { return millis(); }
 
-MPG mpg(DEBOUNCE_MILLIS, HAS_STORAGE);
+MPGS mpg(DEBOUNCE_MILLIS);
 
 void setup()
 {
