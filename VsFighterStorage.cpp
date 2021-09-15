@@ -1,8 +1,8 @@
-#include <string.h>
-#include <GamepadStorage.h>
-#include <EEPROM.h>
+#include "VsFighterStorage.h"
 
-void GamepadStorage::get(int index, void *data, uint16_t size)
+#define STORAGE_DISABLE_STATUS_LED_INDEX (STORAGE_FIRST_AVAILBLE_INDEX) // 1 byte
+
+void VsFighterStorage::get(int index, void *data, uint16_t size)
 {
 	uint8_t buffer[size] = { };
 	for (int i = 0; i < size; i++)
@@ -11,7 +11,7 @@ void GamepadStorage::get(int index, void *data, uint16_t size)
 	memcpy(data, buffer, size);
 }
 
-void GamepadStorage::set(int index, void *data, uint16_t size)
+void VsFighterStorage::set(int index, void *data, uint16_t size)
 {
 	uint8_t buffer[size] = { };
 	memcpy(buffer, data, size);
@@ -19,5 +19,14 @@ void GamepadStorage::set(int index, void *data, uint16_t size)
 		EEPROM.put(index + i, buffer[i]);
 }
 
-void GamepadStorage::start() { }
-void GamepadStorage::save() { }
+bool VsFighterStorage::getDisableStatusLED()
+{
+	bool enabled = true;
+	get(STORAGE_DISABLE_STATUS_LED_INDEX, &enabled, sizeof(bool));
+	return enabled;
+}
+
+void VsFighterStorage::setDisabledStatusLED(bool enabled)
+{
+	set(STORAGE_DISABLE_STATUS_LED_INDEX, &enabled, sizeof(bool));
+}
