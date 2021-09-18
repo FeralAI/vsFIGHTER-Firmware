@@ -3,6 +3,8 @@
 
 #include <MPGS.h>
 
+#define HAS_STATUS_LED
+
 // Pin mappings
 #define PORT_PIN_UP     PF7 // A0
 #define PORT_PIN_DOWN   PF6 // A1

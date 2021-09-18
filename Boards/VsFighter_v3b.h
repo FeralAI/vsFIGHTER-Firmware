@@ -3,6 +3,8 @@
 
 #include <MPGS.h>
 
+#define HAS_STATUS_LED
+
 // Pin mappings
 #define PORT_PIN_UP     PF7 // A0
 #define PORT_PIN_DOWN   PF6 // A1
@@ -16,14 +18,15 @@
 #define PORT_PIN_K2     PD1 // 2/SDA
 #define PORT_PIN_K3     PB6 // 10
 #define PORT_PIN_K4     PD7 // 6
-#define PORT_PIN_START  PB3 // 14
-#define PORT_PIN_SELECT PB5 // 9
-#define PORT_PIN_LS     PC6
-#define PORT_PIN_RS     PE6
+#define PORT_PIN_SELECT PB3 // 14
+#define PORT_PIN_START  PB2 // 16
+#define PORT_PIN_LS     PE6
+#define PORT_PIN_RS     PC6
 #define PORT_PIN_HOME   PB4 // 8
+#define PORT_PIN_FUNC   PB5 // 9
 
 // Input masks
-#define PORTB_INPUT_MASK 0b01111010
+#define PORTB_INPUT_MASK 0b01111110
 #define PORTC_INPUT_MASK 0b01000000
 #define PORTD_INPUT_MASK 0b10011111
 #define PORTE_INPUT_MASK 0b01000000
@@ -93,9 +96,10 @@ class VsFighter: public MPGS {
 				| ((ports[PORTB_INDEX] >> PORT_PIN_K3 & 1)     ? GAMEPAD_MASK_R2    : 0) // Generic: K3, Switch: ZR, Xbox: RT (Digital)
 				| ((ports[PORTB_INDEX] >> PORT_PIN_SELECT & 1) ? GAMEPAD_MASK_S1    : 0) // Generic: Select, Switch: -, Xbox: View
 				| ((ports[PORTB_INDEX] >> PORT_PIN_START & 1)  ? GAMEPAD_MASK_S2    : 0) // Generic: Start, Switch: +, Xbox: Menu
-				| ((ports[PORTE_INDEX] >> PORT_PIN_LS & 1)     ? GAMEPAD_MASK_L3    : 0) // All: Left Stick Click
-				| ((ports[PORTC_INDEX] >> PORT_PIN_RS & 1)     ? GAMEPAD_MASK_R3    : 0) // All: Right Stick Click
+				| ((ports[PORTC_INDEX] >> PORT_PIN_LS & 1)     ? GAMEPAD_MASK_L3    : 0) // All: Left Stick Click
+				| ((ports[PORTE_INDEX] >> PORT_PIN_RS & 1)     ? GAMEPAD_MASK_R3    : 0) // All: Right Stick Click
 				| ((ports[PORTB_INDEX] >> PORT_PIN_HOME & 1)   ? GAMEPAD_MASK_A1    : 0) // All: Home/Guide
+				| ((ports[PORTB_INDEX] >> PORT_PIN_FUNC & 1)   ? GAMEPAD_MASK_A2    : 0) // All: Function/settings button
 			;
 		}
 };
