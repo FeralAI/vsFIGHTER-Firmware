@@ -38,9 +38,6 @@
 #define PORTE_INDEX 3
 #define PORTF_INDEX 4
 
-// Define time function for gamepad debouncer
-uint32_t GamepadDebouncer::getMillis() { return millis(); }
-
 class VsFighter: public MPGS {
 	public:
 		VsFighter(int debounceMS, GamepadStorage *storage) : MPGS(debounceMS, storage) {
@@ -75,16 +72,15 @@ class VsFighter: public MPGS {
 			// Cache port states
 			uint8_t ports[] = { ~PINB, ~PINC, ~PIND, ~PINE, ~PINF };
 
-			// No analog triggers
-			state.lt = 0;
-			state.rt = 0;
-
 			// Gather raw inputs
-			state.buttons = 0
+			state.dpad = 0
 				| ((ports[PORTF_INDEX] >> PORT_PIN_UP    & 1)  ? GAMEPAD_MASK_UP    : 0)
 				| ((ports[PORTF_INDEX] >> PORT_PIN_DOWN  & 1)  ? GAMEPAD_MASK_DOWN  : 0)
 				| ((ports[PORTF_INDEX] >> PORT_PIN_LEFT  & 1)  ? GAMEPAD_MASK_LEFT  : 0)
 				| ((ports[PORTF_INDEX] >> PORT_PIN_RIGHT & 1)  ? GAMEPAD_MASK_RIGHT : 0)
+			;
+
+			state.buttons = 0
 				| ((ports[PORTD_INDEX] >> PORT_PIN_K1 & 1)     ? GAMEPAD_MASK_B1    : 0) // Generic: K1, Switch: B, Xbox: A
 				| ((ports[PORTD_INDEX] >> PORT_PIN_K2 & 1)     ? GAMEPAD_MASK_B2    : 0) // Generic: K2, Switch: A, Xbox: B
 				| ((ports[PORTD_INDEX] >> PORT_PIN_P1 & 1)     ? GAMEPAD_MASK_B3    : 0) // Generic: P1, Switch: Y, Xbox: X

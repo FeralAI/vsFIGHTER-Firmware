@@ -7,8 +7,6 @@
 
 #define DEBOUNCE_MILLIS 5
 
-#define REV_V3B
-
 #include <LUFA.h>
 #include "LUFADriver.h"
 #include "BoardSelect.h"
@@ -19,6 +17,8 @@
 
 VsFighterStorage storage;
 VsFighter board(DEBOUNCE_MILLIS, &storage);
+
+uint32_t getMillis() { return millis(); }
 
 void setup()
 {
@@ -75,7 +75,7 @@ void loop()
 	static const uint32_t intervalMS = 1;
 	static uint32_t nextRuntime = 0;
 
-	if (GamepadDebouncer::getMillis() - nextRuntime < 0)
+	if (millis() - nextRuntime < 0)
 		return;
 
 	board.read();
@@ -99,5 +99,5 @@ void loop()
 	report = board.getReport();
 	sendReport(report, reportSize);
 
-	nextRuntime = GamepadDebouncer::getMillis() + intervalMS;
+	nextRuntime = millis() + intervalMS;
 }

@@ -3,13 +3,9 @@
 
 #ifdef REV_V3B
 #include "Boards/VsFighter_v3b.h"
-#endif
-
-#ifdef REV_V2B
+#elif REV_V2B
 #include "Boards/VsFighter_v2b.h"
-#endif
-
-#ifdef REV_V2
+#else
 #include "Boards/VsFighter.h"
 #endif
 
