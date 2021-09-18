@@ -7,8 +7,6 @@
 
 #define DEBOUNCE_MILLIS 5
 
-#define REV_V3B
-
 #include <LUFA.h>
 #include "LUFADriver.h"
 #include "BoardSelect.h"
