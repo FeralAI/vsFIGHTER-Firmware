@@ -21,18 +21,12 @@ void configureLEDs()
 
 void setStatusLEDColor(CRGB color)
 {
-	if (!LedEnabled)
-		return;
-
 	statusLEDs[0] = color;
 	FastLED.show();
 }
 
 void tryBlinkStatusLED(CEveryNMilliseconds *ledTimer)
 {
-	if (!LedEnabled)
-		return;
-
 	uint32_t currentTime = millis();
 	if (remainingBlinks > 0 && currentTime > nextBlinkTime)
 	{

@@ -5,6 +5,8 @@
 #include <GamepadStorage.h>
 #include <EEPROM.h>
 
+#define STORAGE_DISABLE_STATUS_LED_INDEX (STORAGE_FIRST_AVAILBLE_INDEX) // 1 byte
+
 class VsFighterStorage : public GamepadStorage
 {
 	public:
@@ -15,7 +17,7 @@ class VsFighterStorage : public GamepadStorage
 		void save() { }
 
 		bool getDisableStatusLED();
-		void setDisabledStatusLED(bool enabled);
+		void setDisableStatusLED(bool disabled);
 };
 
 #endif

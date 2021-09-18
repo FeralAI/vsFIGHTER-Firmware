@@ -5,12 +5,14 @@
 
 #define BLINK_DELAY 125
 #define LED_BRIGHTNESS 64 // 8-bit value (0-255)
+
+#ifndef STATUS_LED_PIN
 #define STATUS_LED_PIN 13 // PC7
+#endif
 
 static CRGB statusLEDs[1];
 
-static bool LedEnabled = true;
-static const CRGB HIDLEDColor = CRGB::CornflowerBlue;
+static const CRGB HIDLEDColor = CRGB::DeepSkyBlue;
 static const CRGB SwitchLEDColor = CRGB::FireBrick;
 static const CRGB XInputLEDColor = CRGB::LimeGreen;
 

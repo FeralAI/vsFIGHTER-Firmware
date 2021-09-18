@@ -1,7 +1,5 @@
 #include "VsFighterStorage.h"
 
-#define STORAGE_DISABLE_STATUS_LED_INDEX (STORAGE_FIRST_AVAILBLE_INDEX) // 1 byte
-
 void VsFighterStorage::get(int index, void *data, uint16_t size)
 {
 	uint8_t buffer[size] = { };
@@ -21,12 +19,13 @@ void VsFighterStorage::set(int index, void *data, uint16_t size)
 
 bool VsFighterStorage::getDisableStatusLED()
 {
-	bool enabled = true;
-	get(STORAGE_DISABLE_STATUS_LED_INDEX, &enabled, sizeof(bool));
-	return enabled;
+	uint8_t disabled = 0;
+	get(STORAGE_DISABLE_STATUS_LED_INDEX, &disabled, sizeof(uint8_t));
+	return disabled;
 }
 
-void VsFighterStorage::setDisabledStatusLED(bool enabled)
+void VsFighterStorage::setDisableStatusLED(bool disabled)
 {
-	set(STORAGE_DISABLE_STATUS_LED_INDEX, &enabled, sizeof(bool));
+	uint8_t value = disabled ? 1 : 0;
+	set(STORAGE_DISABLE_STATUS_LED_INDEX, &disabled, sizeof(uint8_t));
 }

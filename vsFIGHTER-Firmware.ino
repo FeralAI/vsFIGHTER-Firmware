@@ -7,12 +7,15 @@
 
 #define DEBOUNCE_MILLIS 5
 
+#define REV_V3B
+
 #include <LUFA.h>
 #include "LUFADriver.h"
 #include "BoardSelect.h"
 #include "VsFighterStorage.h"
-#ifdef HAS_STATUS_LED
+#ifdef STATUS_LED_PIN
 #include "LEDController.h"
+bool ledDisabled = false;
 #endif
 
 VsFighterStorage storage;
@@ -34,12 +37,15 @@ void setup()
 	else if (board.pressedS2())
 		inputMode = INPUT_MODE_XINPUT;
 
-#ifdef HAS_STATUS_LED
+#ifdef STATUS_LED_PIN
+	ledDisabled = storage.getDisableStatusLED();
 	if (board.pressedA1())
-		storage.setDisabledStatusLED(!storage.getDisableStatusLED());
+	{
+		ledDisabled = !ledDisabled;
+		storage.setDisableStatusLED(ledDisabled);
+	}
 
-	LedEnabled = !storage.getDisableStatusLED();
-	if (LedEnabled)
+	if (!ledDisabled)
 	{
 		configureLEDs();
 
@@ -84,20 +90,23 @@ void loop()
 #endif
 	hotkey = board.hotkey();
 
-#ifdef HAS_STATUS_LED
-	if (hotkey != GamepadHotkey::HOTKEY_NONE)
-		blinkStatusLED(3);
-
-	EVERY_N_MILLIS_I(thisTimer, 50)
-	{
-		tryBlinkStatusLED(&thisTimer);
-	}
-#endif
-
 	board.process();
 
 	report = board.getReport();
 	sendReport(report, reportSize);
+
+#ifdef STATUS_LED_PIN
+	if (!ledDisabled)
+	{
+		if (hotkey != GamepadHotkey::HOTKEY_NONE)
+			blinkStatusLED(3);
+
+		EVERY_N_MILLIS_I(thisTimer, 50)
+		{
+			tryBlinkStatusLED(&thisTimer);
+		}
+	}
+#endif
 
 	nextRuntime = millis() + intervalMS;
 }
