@@ -65,16 +65,11 @@ SOCD mode is saved across power cycles.
 
 Input latency is tested using the methodology outlined at [WydD's outstanding inputlag.science website](https://inputlag.science/controller/methodology), using the default 1000Hz (1ms) polling rate in the firmware.
 
-| XInput Mode | Up Priority SOCD | Neutral SOCD | Last Win SOCD |
-| - | - | - | - |
-| **polling** | 1 ms | 1 ms | 1 ms |
-| **min** | 0.56 ms | 0.56 ms | 0.56 ms |
-| **max** | 1.65 ms | 1.59 ms | 1.65 ms |
-| **avg** | 0.96 ms | 0.94 ms | 0.93 ms |
-| **stdev** | 0.28 ms | 0.27 ms | 0.28 ms |
-| **% on time** | 95.26% | 95.38% | 95.46% |
-| **%1f skip** | 4.74% | 4.62% | 4.54% |
-| **%2f skip** | 0% | 0% | 0% |
+| Poll Rate | Min | Max | Avg | Stdev | % on time | %1f skip | %2f skip |
+| - | - | - | - | - | - | - | - |
+| 1 ms | 0.56 ms | 1.72 ms | 1.00 ms | 0.30 ms | 95.00% | 5.00% | 0% |
+
+This is typical performance in across all input modes and D-pad/SOCD options.
 
 ## Installation
 
@@ -88,11 +83,29 @@ Perform the following steps to update your controller.
 1. TUFUpdater should automatically find your controller and begin the update process.
 1. After a few seconds you should see a message about flashing success.
 
+## Building From Source
+
+Requires the [Arduino LUFA boards package](https://github.com/CrazyRedMachine/Arduino-Lufa) and the [MPG v0.1.0](https://github.com/FeralAI/MPG/releases/tag/v0.1.0) input handling library.
+
+1. Download and unzip the MPG library to your Arduino library folder.
+1. Set up the Arduino LUFA boards package according to the [installation instructions](https://github.com/CrazyRedMachine/Arduino-Lufa#installation).
+1. Open the `vsFIGHTER-Firmware.ino` file with Arduino IDE.
+1. In the Arduino IDE board selection (`Tools > Board`), choose `Arduino LUFA AVR Boards > Arduino Leonardo (LUFA)`.
+1. Build and upload the sketch. Double-press the reset button when you see something like this in the console output during upload:
+
+    ```sh
+    Uploading...
+    PORTS {COM7, COM49, } / {COM7, COM49, } => {}
+    PORTS {COM7, COM49, } / {COM7, COM49, } => {}
+    ```
+
+1. Enjoy the latest bleeding edge firmware version!
+
 ## Changelog
 
 ### v2.0.0
 
-* Integrate [MPG library](https://github.com/FeralAI/MPG) for input handling
+* Integrate [MPG v0.1.0](https://github.com/FeralAI/MPG) input handling library
 
 ### v1.0.2
 
