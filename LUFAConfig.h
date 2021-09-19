@@ -1,6 +1,6 @@
 // LUFA Library Configuration Header File. Used to configure LUFA's compile time options, as an alternative to the compile-time defines.
-#ifndef _LUFA_CONFIG_H_
-#define _LUFA_CONFIG_H_
+#ifndef LUFA_CONFIG_H_
+#define LUFA_CONFIG_H_
 
 #include <Arduino.h>
 #define F_USB F_CPU
@@ -28,8 +28,8 @@
 		// #define NO_SOF_EVENTS
 
 		// USB Device Mode Driver Related Tokens
-		// #define USE_RAM_DESCRIPTORS
-		#define USE_FLASH_DESCRIPTORS
+		#define USE_RAM_DESCRIPTORS
+		// #define USE_FLASH_DESCRIPTORS
 		// #define USE_EEPROM_DESCRIPTORS
 		// #define NO_INTERNAL_SERIAL
 		#define FIXED_CONTROL_ENDPOINT_SIZE      64

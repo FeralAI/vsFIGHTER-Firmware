@@ -1,47 +1,110 @@
-#include <LUFA.h>
+/**
+ * vsFIGHTER-Firmware
+ * v2.0.0
+ * 
+ * Multiplatform gamepad firmware supporting XInput, DirectInput and Nintendo Switch.
+ */
 
-#define FIRMWARE_VERSION "1.0.2"
-
-// Override default debounce time set for the board, 0 to disable
 #define DEBOUNCE_MILLIS 5
 
-#include "VsFighter.h"
-VsFighter board;
-
-void setup() {
-	// Configure board
-	board.setup();
-
-	// Get saved options
-	board.load();
-
-	// Set input mode and persist if necessary
-	board.configureInputMode();
-
-	// Configure USB HID
-	SetupHardware(board.inputMode);
-	GlobalInterruptEnable();
-
-	delay(50);
-	board.update();
-}
-
-
-void loop() {
-	// Read inputs
-	board.read();
-
-#if DEBOUNCE_MILLIS > 0
-	// Run debouncing if required
-	board.debounce();
+#include <LUFA.h>
+#include "LUFADriver.h"
+#include "BoardSelect.h"
+#include "VsFighterStorage.h"
+#ifdef STATUS_LED_PIN
+#include "LEDController.h"
+bool ledDisabled = false;
 #endif
 
-	// Check for hotkey changes, can react to returned hotkey action
-	board.hotkey();
+VsFighterStorage storage;
+VsFighter board(DEBOUNCE_MILLIS, &storage);
 
-	// Process the raw inputs into a usable state
+uint32_t getMillis() { return millis(); }
+
+void setup()
+{
+	board.setup();
+	board.load();
+	board.read();
+
+	InputMode inputMode = board.inputMode;
+	if (board.pressedR3())
+		inputMode = INPUT_MODE_HID;
+	else if (board.pressedS1())
+		inputMode = INPUT_MODE_SWITCH;
+	else if (board.pressedS2())
+		inputMode = INPUT_MODE_XINPUT;
+
+#ifdef STATUS_LED_PIN
+	ledDisabled = storage.getDisableStatusLED();
+	if (board.pressedA1())
+	{
+		ledDisabled = !ledDisabled;
+		storage.setDisableStatusLED(ledDisabled);
+	}
+
+	if (!ledDisabled)
+	{
+		configureLEDs();
+
+		switch (inputMode)
+		{
+			case INPUT_MODE_HID:
+				setStatusLEDColor(HIDLEDColor);
+				break;
+			case INPUT_MODE_SWITCH:
+				setStatusLEDColor(SwitchLEDColor);
+				break;
+			case INPUT_MODE_XINPUT:
+				setStatusLEDColor(XInputLEDColor);
+				break;
+		}
+	}
+#endif
+
+	if (inputMode != board.inputMode)
+	{
+		board.inputMode = inputMode;
+		board.save();
+	}
+
+	setupHardware(board.inputMode);
+}
+
+void loop()
+{
+	static const uint8_t reportSize = board.getReportSize();
+	static void *report;
+	static GamepadHotkey hotkey;
+	static const uint32_t intervalMS = 1;
+	static uint32_t nextRuntime = 0;
+
+	if (millis() - nextRuntime < 0)
+		return;
+
+	board.read();
+#if DEBOUNCE_MILLIS > 0
+	board.debounce();
+#endif
+	hotkey = board.hotkey();
+
 	board.process();
 
-	// Run the USB task for this loop cycle
-	board.update();
+	report = board.getReport();
+	sendReport(report, reportSize);
+
+#ifdef STATUS_LED_PIN
+	if (!ledDisabled)
+	{
+		if (hotkey != GamepadHotkey::HOTKEY_NONE)
+			blinkStatusLED(3);
+
+		EVERY_N_MILLIS_I(thisTimer, 50)
+		{
+			tryBlinkStatusLED(&thisTimer);
+		}
+	}
+#endif
+
+	nextRuntime = millis() + intervalMS;
 }
