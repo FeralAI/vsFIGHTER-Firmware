@@ -101,6 +101,10 @@ Requires the [Arduino LUFA boards package](https://github.com/CrazyRedMachine/Ar
 
 1. Enjoy the latest bleeding edge firmware version!
 
+## Support
+
+If you would like to discuss features, issues, or anything else related to vsFIGHTER-Firmware join the [vsFIGHTER-Firmware Discord channel](https://discord.gg/KDZwFysz).
+
 ## Changelog
 
 ### v2.0.0
